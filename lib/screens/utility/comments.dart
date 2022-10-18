@@ -15,6 +15,7 @@ class CommentsPage extends StatelessWidget {
     var list = myprovider.getpostListing;
     final texteditingcontroller = TextEditingController();
     final postindex = Get.arguments;
+
     void addcommenttoList() {
       myprovider.addCommenttoPost(postindex, texteditingcontroller.text);
     }

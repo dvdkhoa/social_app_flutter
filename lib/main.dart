@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/providers/navbar.dart';
 import 'package:ltp/providers/post_temp.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:ltp/utils/routes.dart';
 import 'package:provider/provider.dart';
 import 'package:get_storage/get_storage.dart';
-import 'providers/posts.dart';
 
 main() async {
   await GetStorage.init();

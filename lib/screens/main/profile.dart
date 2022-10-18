@@ -1,17 +1,61 @@
 import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/postmodel.dart';
 import 'package:ltp/providers/posts.dart';
 import 'package:ltp/utils/constants.dart';
+import 'package:ltp/widgets/custom_post-widget.dart';
 import 'package:ltp/widgets/post_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+class ProfilePage extends StatefulWidget {
+  ProfilePage({Key? key}) : super(key: key);
+
+  // bool isUserLogin;
+
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+
+  final userLogin = GetStorage().read('userLogin');
+
+  List _list = [];
+
+  Future? _callAPI = null;
+
+  Future _callAPIPost() async {
+    final dio = Dio();
+    final res = await dio.get('https://10.0.2.2:7284/api/Post/GetWall?userId='+userLogin['userId']);
+
+    final map = Map<String, dynamic>.from(res.data);
+
+    var list = map['data'] as List;
+
+    return list;
+  }
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _callAPI = _callAPIPost();
+
+    _callAPI?.then((list) {
+      setState(() {
+        _list = list;
+        _list = _list.reversed.toList();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +97,7 @@ class ProfilePage extends StatelessWidget {
                         radius: Get.height * 0.105,
                         child: CircleAvatar(
                           backgroundImage:
-                              NetworkImage(postmodel.user.profileImage),
+                              NetworkImage(userLogin['profile']['image']),
                           radius: Get.height * 0.1,
                         ),
                       ),
@@ -63,7 +107,8 @@ class ProfilePage extends StatelessWidget {
                       Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          postmodel.user.name.text.bold
+                          userLogin['profile']['name'].toString().text
+                          // postmodel.user.name.text.bold
                               .minFontSize(Get.textScaleFactor * 22)
                               .letterSpacing(2)
                               .makeCentered(),
@@ -152,35 +197,59 @@ class ProfilePage extends StatelessWidget {
               thickness: 1,
             ),
             'Posts'.text.minFontSize(18).letterSpacing(1).bold.makeCentered(),
-            listp.isEmpty
+            _list.isEmpty
                 ? SizedBox(
                     child: 'No Posts available'.text.makeCentered(),
                     height: Get.height * 0.3,
                   )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return index % 2 == 0
-                          ? FadeInLeft(
-                              duration: const Duration(milliseconds: 600),
-                              from: 400,
-                              child: PostWidget(
-                                datamodel: listp[index],
-                                index: index,
-                              ),
-                            )
-                          : FadeInRight(
-                              duration: const Duration(milliseconds: 600),
-                              from: 400,
-                              child: PostWidget(
-                                datamodel: listp[index],
-                                index: index,
-                              ),
-                            );
-                    },
-                    itemCount: listp.length,
-                  ),
+                // : ListView.builder(
+                //     shrinkWrap: true,
+                //     physics: const NeverScrollableScrollPhysics(),
+                //     itemBuilder: (context, index) {
+                //       return index % 2 == 0
+                //           ? FadeInLeft(
+                //               duration: const Duration(milliseconds: 600),
+                //               from: 400,
+                //               child: PostWidget(
+                //                 datamodel: listp[index],
+                //                 index: index,
+                //               ),
+                //             )
+                //           : FadeInRight(
+                //               duration: const Duration(milliseconds: 600),
+                //               from: 400,
+                //               child: PostWidget(
+                //                 datamodel: listp[index],
+                //                 index: index,
+                //               ),
+                //             );
+                //     },
+                //     itemCount: listp.length,
+                //   ),
+            : ListView.builder(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: ((context, index) {
+                int actualindex = _list.length - index - 1;
+                return index % 2 == 0
+                    ? ElasticInLeft(
+                    duration: const Duration(milliseconds: 600),
+                    from: 400,
+                    child: CustomPostWidget(
+                      datamodel: _list[actualindex],
+                      index: actualindex,
+                    ))
+                    : ElasticInRight(
+                    duration: const Duration(milliseconds: 600),
+                    from: 400,
+                    child: CustomPostWidget(
+                      datamodel: _list[actualindex],
+                      index: actualindex,
+                    ));
+              }),
+              itemCount: _list.length,
+            ),
           ],
         ),
       ),

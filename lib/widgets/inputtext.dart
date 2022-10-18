@@ -17,7 +17,7 @@ class CustomTextInputWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Container(
-          padding: const EdgeInsets.only(top: 5, bottom: 13, left: 10),
+          padding: const EdgeInsets.only(top: 5, bottom: 1, left: 10),
           margin: const EdgeInsets.only(left: 8),
           height: Get.height * 0.06,
           width: Get.width * 0.8,
@@ -28,10 +28,12 @@ class CustomTextInputWidget extends StatelessWidget {
           ),
           child: TextField(
             cursorColor: kaccentColor,
+            textAlignVertical: TextAlignVertical.center,
             //autofocus: true,
             controller: msgController,
             decoration: const InputDecoration(
               border: InputBorder.none,
+              hintText: 'Viết gì đó'
             ),
           ),
         ),

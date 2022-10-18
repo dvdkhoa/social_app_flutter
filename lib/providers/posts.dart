@@ -55,4 +55,13 @@ class PostsProvider with ChangeNotifier {
     _postList[index].likes.add(manwholikes);
     notifyListeners();
   }
+
+
+
+  void getCommentsByPostId(String postId){
+    // _postList.where((post) => post)
+    _postList.forEach((element) {
+      print(element);
+    });
+  }
 }

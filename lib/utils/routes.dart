@@ -16,6 +16,7 @@ import '../screens/main/inbox.dart';
 import '../screens/main/notifications.dart';
 import '../screens/main/profile.dart';
 import '../screens/main/search.dart';
+import '../widgets/custom_comments.dart';
 
 class RoutingPages {
   List<GetPage<dynamic>> pages = [
@@ -45,7 +46,7 @@ class RoutingPages {
     ),
     GetPage(
       name: '/profilepage',
-      page: () => const ProfilePage(),
+      page: () => ProfilePage(),
     ),
     GetPage(
       name: '/searchpage',
@@ -61,7 +62,7 @@ class RoutingPages {
     ),
     GetPage(
       name: '/commentspage',
-      page: () => const CommentsPage(),
+      page: () => CustomCommentsPage(),
     ),
     GetPage(
       name: '/msgspage',

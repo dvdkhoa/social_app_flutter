@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart' as dio;
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +21,9 @@ class PostScreen extends StatefulWidget {
 class _PostScreenState extends State<PostScreen> {
   ImagePicker picker = ImagePicker();
 
+  final userLogin = GetStorage().read("userLogin");
+
+
   File? imageFile;
   var formController = TextEditingController();
 
@@ -26,27 +32,70 @@ class _PostScreenState extends State<PostScreen> {
     setState(() {
       if (pickedFile != null) {
         imageFile = File(pickedFile.path);
+        print('da chon image');
+        print(imageFile);
       } else {
         debugPrint('File not Picked');
       }
     });
   }
 
-  void uploadIt() async {
-    var myPostModel = PostModel();
-    String texty = formController.text;
-    if (texty.isEmpty && imageFile == null) {
-      return;
-    } else {
-      if (texty.isNotEmpty) {
-        myPostModel.tweetText = texty;
-      } else {}
-      if (imageFile != null) {
-        myPostModel.tweetImage = imageFile;
-      } else {}
-      myPostModel.uploadTime = DateFormat.yMEd().format(DateTime.now());
-      Get.back(result: myPostModel);
+  // void uploadIt() async {
+  //   var myPostModel = PostModel();
+  //   String texty = formController.text;
+  //
+  //   if (texty.isEmpty && imageFile == null) {
+  //     return;
+  //   } else {
+  //     if (texty.isNotEmpty) {
+  //       myPostModel.tweetText = texty;
+  //     } else {}
+  //     if (imageFile != null) {
+  //       myPostModel.tweetImage = imageFile;
+  //     } else {}
+  //     myPostModel.uploadTime = DateFormat.yMEd().format(DateTime.now());
+  //     Get.back(result: myPostModel);
+  //   }
+  // }
+  
+  void uploadPost() async{
+    // print(userLogin['userId']);
+    dio.FormData formData ;
+    if (imageFile != null) {
+      // print('imagefile khong null');
+      String? fileName = imageFile?.path.split('/').last;
+
+      final file = await dio.MultipartFile.fromFile(imageFile!.path, filename: fileName);
+
+      // print(file);
+      // print('filepath: ${imageFile!.path}');
+
+       formData = dio.FormData.fromMap({
+        "UserId": userLogin['userId'],
+        "Text": formController.text,
+        "PhotoFile": file,
+      });
+    }else {
+      // print('imagefile null');
+
+      formData = dio.FormData.fromMap({
+        "UserId": userLogin['userId'],
+        "Text": formController.text,
+      });
     }
+    // print('file upload');
+    // print(imageFile);
+
+    final res = await dio.Dio().post("https://10.0.2.2:7284/api/Post/CreatePost",
+        data: formData,
+      //   onSendProgress: (send, total) {
+      // // print("send: $send, total: $total");
+      //   }
+    );
+
+    print(res);
+
+    Get.back();
   }
 
   @override
@@ -91,7 +140,7 @@ class _PostScreenState extends State<PostScreen> {
                       )
                     : Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(8.0),
                           child: Image.file(
                             imageFile!,
                             width: Get.width * 0.7,
@@ -107,8 +156,9 @@ class _PostScreenState extends State<PostScreen> {
                   bottom: 30,
                 ),
                 child: ElevatedButton(
-                  onPressed: () {
-                    uploadIt();
+                  onPressed: () async{
+                    // uploadIt();
+                    uploadPost();
                   },
                   child: 'Upload'
                       .text

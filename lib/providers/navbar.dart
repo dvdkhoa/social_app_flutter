@@ -6,7 +6,16 @@ import 'package:velocity_x/velocity_x.dart';
 
 class NavBarProvider with ChangeNotifier {
 
+  List _users = [];
 
+  void addAllUser(List users){
+    _users = users;
+    notifyListeners();
+  }
+
+  List getUserList() {
+    return _users;
+  }
 
   var search = TextEditingController();
 
@@ -59,10 +68,11 @@ class NavBarProvider with ChangeNotifier {
                   print(value);
                   Dio dio = Dio();
                   dio.get('https://10.0.2.2:7284/api/Account/SearchUser?userName='+value)
-                      .then((value) {
-                    print(value);
-
-                  });
+                      .then((res) {
+                        List users = res.data;
+                        addAllUser(users);
+                        print(_users);
+                      });
                 }
               },
               style: TextStyle(

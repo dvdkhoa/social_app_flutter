@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ltp/providers/posts.dart';
+// import 'package:ltp/providers/posts.dart';
+import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +16,7 @@ class CustomFloatingActionButton extends StatelessWidget {
       onPressed: () {
         Get.toNamed('/postpage')!.then((value) {
           if (value != null) {
-            postProvider.addToPostList(value);
+            // postProvider.addToPostList(value);
             // debugPrint(value.tweetText!);
             debugPrint(value.tweetImage.path!);
           }
