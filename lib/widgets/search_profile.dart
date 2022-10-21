@@ -23,7 +23,7 @@ class _SearchProfileState extends State<SearchProfile> {
 
     return InkWell(
       onTap: (){
-        Get.toNamed('/profilepage');
+        Get.toNamed('/profilepage', arguments: widget.datamodel['id']);
       },
       child: Container(
         margin: const EdgeInsets.all(8),

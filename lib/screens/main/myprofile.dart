@@ -13,45 +13,33 @@ import 'package:ltp/widgets/post_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class ProfilePage extends StatefulWidget {
-  ProfilePage({Key? key}) : super(key: key);
+class myProfilePage extends StatefulWidget {
+  myProfilePage({Key? key}) : super(key: key);
+
+  // bool isUserLogin;
+
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<myProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<myProfilePage> {
+
   final userLogin = GetStorage().read('userLogin');
-
-  bool isFollow = false;
-
-  dynamic _user;
-
-  String userId = Get.arguments.toString();
 
   List _list = [];
 
   Future? _callAPI = null;
 
-  Future _callAPIWall() async {
-    var list = [];
+  Future _callAPIPost() async {
     final dio = Dio();
-    final res = await dio.get('https://10.0.2.2:7284/api/Post/GetWall?userId='+userId);
+    final res = await dio.get('https://10.0.2.2:7284/api/Post/GetWall?userId='+userLogin['userId']);
 
     final map = Map<String, dynamic>.from(res.data);
-    print(map);
-    if(map['data'] != null)
-       list = map['data']  as List;
+
+    var list = map['data'] as List;
 
     return list;
-  }
-
-  Future _callAPIGetUser() async{
-    final dio = Dio();
-    final res = await dio.get('https://10.0.2.2:7284/api/Account/GetUser?userId='+userId);
-    final map = Map<String, dynamic>.from(res.data);
-
-    return map;
   }
 
 
@@ -59,23 +47,12 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _callAPI = _callAPIPost();
 
-    _callAPIGetUser().then((user) {
+    _callAPI?.then((list) {
       setState(() {
-        _user = user;
-        final map = Map<String, dynamic>.from(_user['followers']);
-
-        isFollow = map.containsKey(userLogin['userId']);
-      });
-
-      _callAPI = _callAPIWall();
-
-      _callAPI?.then((list) {
-        setState(() {
-          print(list);
-          _list = list;
-          _list = _list.reversed.toList();
-        });
+        _list = list;
+        _list = _list.reversed.toList();
       });
     });
   }
@@ -83,8 +60,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     var postmodel = PostModel();
-    print('222');
-    print(userId);
 
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(0.9),
@@ -114,15 +89,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   left: Get.width * 0.2,
                   right: Get.width * 0.2,
                   bottom: 15,
-                  child: _user != null ? Column(
+                  child: Column(
                     children: [
                       CircleAvatar(
                         backgroundColor: ktxtwhiteColor,
                         radius: Get.height * 0.105,
                         child: CircleAvatar(
                           backgroundImage:
-                              // NetworkImage(userLogin['profile']['image']),
-                          NetworkImage(_user['profile']['image']),
+                          NetworkImage(userLogin['profile']['image']),
                           radius: Get.height * 0.1,
                         ),
                       ),
@@ -132,9 +106,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // userLogin['profile']['name'].toString().text
+                          userLogin['profile']['name'].toString().text
                           // postmodel.user.name.text.bold
-                      _user['profile']['name'].toString().text
                               .minFontSize(Get.textScaleFactor * 22)
                               .letterSpacing(2)
                               .makeCentered(),
@@ -148,7 +121,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -185,31 +158,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ]),
                           ),
                           InkWell(
-                            onTap: () async{
-                              Dio dio = Dio();
-                              var res = await dio.post('https://10.0.2.2:7284/api/Account/Follow',
-                                data: {
-                                  "userId": userLogin['userId'],
-                                  "destId": userId
-                                }
-                              );
-                              print(res);
-                              if(res.data){
-                                setState(() {
-                                  print('object');
-                                  print(isFollow);
-                                  isFollow = !isFollow;
-                                  print(isFollow);
-                                });
-                              }
-                            },
+                            onTap: () {},
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Container(
                                 height: Get.height * 0.04,
                                 width: Get.width * 0.2,
                                 color: kaccentColor,
-                                child: (!isFollow ? 'Follow':'Followed')
+                                child: 'Follow'
                                     .text
                                     .color(Colors.white)
                                     .makeCentered(),
@@ -219,15 +175,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                     ],
-                  )
-                  // : CircularProgressIndicator(),
-                  : const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color?>(
-                        Colors.blueAccent,
-                      ),
-                    ),
-                  )
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -250,34 +198,34 @@ class _ProfilePageState extends State<ProfilePage> {
             'Posts'.text.minFontSize(18).letterSpacing(1).bold.makeCentered(),
             _list.isEmpty
                 ? SizedBox(
-                    child: 'No Posts available'.text.makeCentered(),
-                    height: Get.height * 0.3,
-                  )
-                // : ListView.builder(
-                //     shrinkWrap: true,
-                //     physics: const NeverScrollableScrollPhysics(),
-                //     itemBuilder: (context, index) {
-                //       return index % 2 == 0
-                //           ? FadeInLeft(
-                //               duration: const Duration(milliseconds: 600),
-                //               from: 400,
-                //               child: PostWidget(
-                //                 datamodel: listp[index],
-                //                 index: index,
-                //               ),
-                //             )
-                //           : FadeInRight(
-                //               duration: const Duration(milliseconds: 600),
-                //               from: 400,
-                //               child: PostWidget(
-                //                 datamodel: listp[index],
-                //                 index: index,
-                //               ),
-                //             );
-                //     },
-                //     itemCount: listp.length,
-                //   ),
-            : ListView.builder(
+              child: 'No Posts available'.text.makeCentered(),
+              height: Get.height * 0.3,
+            )
+            // : ListView.builder(
+            //     shrinkWrap: true,
+            //     physics: const NeverScrollableScrollPhysics(),
+            //     itemBuilder: (context, index) {
+            //       return index % 2 == 0
+            //           ? FadeInLeft(
+            //               duration: const Duration(milliseconds: 600),
+            //               from: 400,
+            //               child: PostWidget(
+            //                 datamodel: listp[index],
+            //                 index: index,
+            //               ),
+            //             )
+            //           : FadeInRight(
+            //               duration: const Duration(milliseconds: 600),
+            //               from: 400,
+            //               child: PostWidget(
+            //                 datamodel: listp[index],
+            //                 index: index,
+            //               ),
+            //             );
+            //     },
+            //     itemCount: listp.length,
+            //   ),
+                : ListView.builder(
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),

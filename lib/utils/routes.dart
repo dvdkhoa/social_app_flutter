@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 
 import '../screens/auth/signin.dart';
 import '../screens/main/inbox.dart';
+import '../screens/main/myprofile.dart';
 import '../screens/main/notifications.dart';
 import '../screens/main/profile.dart';
 import '../screens/main/search.dart';
@@ -47,6 +48,10 @@ class RoutingPages {
     GetPage(
       name: '/profilepage',
       page: () => ProfilePage(),
+    ),
+    GetPage(
+      name: '/myprofilepage',
+      page: () => myProfilePage(),
     ),
     GetPage(
       name: '/searchpage',

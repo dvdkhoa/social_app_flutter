@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/postmodel.dart';
 import 'package:ltp/providers/posts.dart';
 import 'package:ltp/utils/constants.dart';
@@ -8,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 // ignore: must_be_immutable
-class CustomPostWidget extends StatelessWidget {
+class CustomPostWidget extends StatefulWidget {
   CustomPostWidget({
     Key? key,
     required this.datamodel,
@@ -16,15 +18,27 @@ class CustomPostWidget extends StatelessWidget {
   }) : super(key: key);
   dynamic datamodel;
   int index;
+
+  @override
+  State<CustomPostWidget> createState() => _CustomPostWidgetState();
+}
+
+class _CustomPostWidgetState extends State<CustomPostWidget> {
+
+  late List likes;
+  late int likeCount;
+
   @override
   Widget build(BuildContext context) {
+    print('build');
 
+    print(widget.datamodel);
 
-    print(datamodel);
+    List photos = widget.datamodel['detail']['photos']!;
+    likes = widget.datamodel['likes'];
+    List comments = widget.datamodel['comments'];
 
-    List photos = datamodel['detail']['photos']!;
-    List likes = datamodel['likes'];
-    List comments = datamodel['comments'];
+    likeCount = likes.length;
 
     print(photos);
 
@@ -54,7 +68,7 @@ class CustomPostWidget extends StatelessWidget {
                     backgroundColor: kaccentColor,
                     child: CircleAvatar(
                       backgroundImage:
-                      NetworkImage(datamodel['by']['image']),
+                      NetworkImage(widget.datamodel['by']['image']),
                       radius: 28,
                     ),
                   ),
@@ -65,7 +79,7 @@ class CustomPostWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        VxTextBuilder(datamodel['by']['name'])
+                        VxTextBuilder(widget.datamodel['by']['name'])
                             .minFontSize(17)
                             .color(kMainColor)
                             .maxFontSize(18)
@@ -89,7 +103,7 @@ class CustomPostWidget extends StatelessWidget {
                             const SizedBox(
                               width: 2,
                             ),
-                            datamodel['meta']['created']
+                            widget.datamodel['meta']['created']
                                 .toString()
                                 .text
                                 .letterSpacing(1)
@@ -110,12 +124,12 @@ class CustomPostWidget extends StatelessWidget {
             ),
             height: 10,
           ),
-          datamodel['detail']['text'].toString().isEmptyOrNull
+          widget.datamodel['detail']['text'].toString().isEmptyOrNull
               ? Container()
               : Padding(
             padding:
             const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-            child: VxTextBuilder(datamodel['detail']['text']).make(),
+            child: VxTextBuilder(widget.datamodel['detail']['text']).make(),
           ),
           photos.length == 0
               ? Container()
@@ -131,13 +145,31 @@ class CustomPostWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               SpecialIcon(
-              val: likes.length.toString(),
+              val: likeCount.toString(),
               iconData: Icons.favorite_border_outlined,
               // ? Icons.favorite_border_outlined
               //     : Icons.favorite,
               color: likes.isEmpty ? kMainColor : kMainColor,
-              doFunction: () {
+              doFunction: () async {
               // valueprovider.addLiketoPost(index, datamodel.user.name);
+                Dio dio = Dio();
+                final res = await dio.post("https://10.0.2.2:7284/api/Post/Like",
+                data: {
+                  "userId": GetStorage().read('userLogin')['userId'],
+                  "postId": widget.datamodel['id']
+                });
+                print('hello');
+
+                final map = Map<String,dynamic>.from(res.data);
+                print(map);
+                setState(() {
+                  print('222');
+                  likeCount = map['data']['likeCount'] as int;
+
+
+                  likes.removeWhere((element) => element['by']['id'] == GetStorage().read('userLogin')['userId']);
+                  print(likeCount);
+                });
               },
               ),
               SpecialIcon(
@@ -145,7 +177,7 @@ class CustomPostWidget extends StatelessWidget {
                   iconData: Icons.comment_outlined,
                   color: kMainColor,
                   doFunction: () {
-                    Get.toNamed('/commentspage', arguments: datamodel['id']);
+                    Get.toNamed('/commentspage', arguments: widget.datamodel['id']);
                   },
                 ),
               SpecialIcon(

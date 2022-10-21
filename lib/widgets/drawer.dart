@@ -12,7 +12,6 @@ class CustomDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final userLogin = GetStorage().read('userLogin');
-
     print(userLogin);
 
     var postmodel = PostModel();
@@ -82,7 +81,9 @@ class CustomDrawer extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          postmodel.user.followings.text
+                          // postmodel.user.followings.text
+                          // followers!.length.text
+                          "0".text
                               .fontWeight(FontWeight.w600)
                               .minFontSize(Get.textScaleFactor * 18)
                               .make(),
@@ -120,7 +121,7 @@ class CustomDrawer extends StatelessWidget {
                     ),
                     InkWell(
                       onTap: () {
-                        Get.toNamed('/profilepage');
+                        Get.toNamed('/myprofilepage');
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
