@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:ltp/models/post.dart';
 import 'package:ltp/providers/custom_posts.dart';
 
 import 'package:ltp/widgets/custom_post-widget.dart';
@@ -24,7 +25,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final userLogin = GetStorage().read('userLogin');
-  // late PostsProvider _postsProvider;
+
+  List<PostModel> _news = [];
   
   List _list = [];
 
@@ -35,6 +37,12 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
 
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      final postProvider = Provider.of<PostsProvider>(context, listen: false);
+      postProvider.getNewsFromServer();
+    });
+
+
     _callAPI = _callAPIPost();
 
     _callAPI?.then((list) {
@@ -44,6 +52,7 @@ class _HomePageState extends State<HomePage> {
       });
     });
   }
+
 
   Future _callAPIPost() async {
     final dio = Dio();
@@ -59,34 +68,44 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+
     // final postProvider = Provider.of<PostsProvider>(context);
-    //
+    // postProvider.getPostsFromServer();
+
     // var postList = postProvider.getpostListing;
 
     // _postsProvider = Provider.of<PostsProvider>(context);
 
 
-    return ListView.builder(
-      itemBuilder: ((context, index) {
-        int actualindex = _list.length - index - 1;
-        return index % 2 == 0
-            ? ElasticInLeft(
-            duration: const Duration(milliseconds: 600),
-            from: 400,
-            child: CustomPostWidget(
-              datamodel: _list[actualindex],
-              index: actualindex,
-            ))
-            : ElasticInRight(
-            duration: const Duration(milliseconds: 600),
-            from: 400,
-            child: CustomPostWidget(
-              datamodel: _list[actualindex],
-              index: actualindex,
-            ));
-      }),
-      itemCount: _list.length,
-    );
+    return Consumer<PostsProvider>(builder: (context, value, child) {
+      if (value.isLoading){
+        return const Center(
+            child: CircularProgressIndicator());
+      }
+
+      return ListView.builder(
+        key: const PageStorageKey<String>("controllerHome"),
+        itemBuilder: ((context, index) {
+          int actualindex = value.news.length - index - 1;
+          return index % 2 == 0
+              ? ElasticInLeft(
+              duration: const Duration(milliseconds: 600),
+              from: 400,
+              child: CustomPostWidget(
+                post: value.news[actualindex],
+                index: actualindex,
+              ))
+              : ElasticInRight(
+              duration: const Duration(milliseconds: 600),
+              from: 400,
+              child: CustomPostWidget(
+                post: value.news[actualindex],
+                index: actualindex,
+              ));
+        }),
+        itemCount: value.news.length,
+      );
+    });
 
 
     // return ListView.builder(

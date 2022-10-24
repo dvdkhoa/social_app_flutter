@@ -2,7 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:ltp/models/postmodel.dart';
+import 'package:ltp/models/post.dart';
+
 import 'package:ltp/providers/posts.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:ltp/widgets/special_icon.dart';
@@ -13,10 +14,11 @@ import 'package:velocity_x/velocity_x.dart';
 class CustomPostWidget extends StatefulWidget {
   CustomPostWidget({
     Key? key,
-    required this.datamodel,
+    required this.post,
     required this.index,
   }) : super(key: key);
-  dynamic datamodel;
+
+  PostModel post;
   int index;
 
   @override
@@ -25,22 +27,22 @@ class CustomPostWidget extends StatefulWidget {
 
 class _CustomPostWidgetState extends State<CustomPostWidget> {
 
-  late List likes;
+  late List<Likes> likes;
+  late List<Comments> comments;
   late int likeCount;
+
 
   @override
   Widget build(BuildContext context) {
     print('build');
 
-    print(widget.datamodel);
-
-    List photos = widget.datamodel['detail']['photos']!;
-    likes = widget.datamodel['likes'];
-    List comments = widget.datamodel['comments'];
+    List<Photos>? photos = widget.post.detail?.photos;
+    // likes = widget.datamodel['likes'];
+    // List comments = widget.datamodel['comments'];
+    likes = widget.post.likes!;
+    comments = widget.post.comments!;
 
     likeCount = likes.length;
-
-    print(photos);
 
     return Container(
       decoration: BoxDecoration(
@@ -68,7 +70,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                     backgroundColor: kaccentColor,
                     child: CircleAvatar(
                       backgroundImage:
-                      NetworkImage(widget.datamodel['by']['image']),
+                      NetworkImage(widget.post.by!.image ?? ""),
                       radius: 28,
                     ),
                   ),
@@ -79,7 +81,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        VxTextBuilder(widget.datamodel['by']['name'])
+                        VxTextBuilder(widget.post.by?.name ?? "")
                             .minFontSize(17)
                             .color(kMainColor)
                             .maxFontSize(18)
@@ -103,7 +105,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                             const SizedBox(
                               width: 2,
                             ),
-                            widget.datamodel['meta']['created']
+                            widget.post.meta!.created
                                 .toString()
                                 .text
                                 .letterSpacing(1)
@@ -124,17 +126,30 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
             ),
             height: 10,
           ),
-          widget.datamodel['detail']['text'].toString().isEmptyOrNull
+          widget.post.detail!.text.toString().isEmptyOrNull
               ? Container()
               : Padding(
             padding:
             const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-            child: VxTextBuilder(widget.datamodel['detail']['text']).make(),
+            child: VxTextBuilder(widget.post.detail!.text.toString()).make(),
           ),
-          photos.length == 0
+          photos!.isEmpty
               ? Container()
-              // : Image.file(datamodel?['detail']['photos'][0]),
-              :Image.network("https://10.0.2.2:7284/"+photos[0]['url']),
+              : InkWell(
+                  child: Image.network("https://10.0.2.2:7284/" + photos![0].url.toString()),
+                  onTap: () {
+                    showDialog(context: context, builder: (context) => AlertDialog(
+                      content: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.network("https://10.0.2.2:7284/" + photos![0].url.toString(),
+                            fit: BoxFit.cover,
+                            height: 200,)
+                        ],
+                      ),
+                    ));
+                  },
+                ),
           const SizedBox(
             child: Divider(
               color: Colors.black38,
@@ -156,7 +171,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                 final res = await dio.post("https://10.0.2.2:7284/api/Post/Like",
                 data: {
                   "userId": GetStorage().read('userLogin')['userId'],
-                  "postId": widget.datamodel['id']
+                  "postId": widget.post.id
                 });
                 print('hello');
 
@@ -167,7 +182,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                   likeCount = map['data']['likeCount'] as int;
 
 
-                  likes.removeWhere((element) => element['by']['id'] == GetStorage().read('userLogin')['userId']);
+                  likes.removeWhere((element) => element.by!.id == GetStorage().read('userLogin')['userId']);
                   print(likeCount);
                 });
               },
@@ -177,7 +192,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                   iconData: Icons.comment_outlined,
                   color: kMainColor,
                   doFunction: () {
-                    Get.toNamed('/commentspage', arguments: widget.datamodel['id']);
+                    Get.toNamed('/commentspage', arguments: widget.post.id);
                   },
                 ),
               SpecialIcon(

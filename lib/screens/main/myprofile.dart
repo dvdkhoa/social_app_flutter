@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/postmodel.dart';
-import 'package:ltp/providers/posts.dart';
+import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:ltp/widgets/custom_post-widget.dart';
 import 'package:ltp/widgets/post_widget.dart';
@@ -47,6 +47,12 @@ class _ProfilePageState extends State<myProfilePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final postProvider = Provider.of<PostsProvider>(context, listen: false);
+      postProvider.getMyWallFromServer();
+    });
+
     _callAPI = _callAPIPost();
 
     _callAPI?.then((list) {
@@ -225,30 +231,32 @@ class _ProfilePageState extends State<myProfilePage> {
             //     },
             //     itemCount: listp.length,
             //   ),
-                : ListView.builder(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: ((context, index) {
-                int actualindex = _list.length - index - 1;
-                return index % 2 == 0
-                    ? ElasticInLeft(
-                    duration: const Duration(milliseconds: 600),
-                    from: 400,
-                    child: CustomPostWidget(
-                      datamodel: _list[actualindex],
-                      index: actualindex,
-                    ))
-                    : ElasticInRight(
-                    duration: const Duration(milliseconds: 600),
-                    from: 400,
-                    child: CustomPostWidget(
-                      datamodel: _list[actualindex],
-                      index: actualindex,
-                    ));
-              }),
-              itemCount: _list.length,
-            ),
+                : Consumer<PostsProvider>(builder: (context, value, child) {
+                  return ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: ((context, index) {
+                      int actualindex = value.myWall.length - index - 1;
+                      return index % 2 == 0
+                          ? ElasticInLeft(
+                          duration: const Duration(milliseconds: 600),
+                          from: 400,
+                          child: CustomPostWidget(
+                            post: value.myWall[actualindex],
+                            index: actualindex,
+                          ))
+                          : ElasticInRight(
+                          duration: const Duration(milliseconds: 600),
+                          from: 400,
+                          child: CustomPostWidget(
+                            post: value.myWall[actualindex],
+                            index: actualindex,
+                          ));
+                    }),
+                    itemCount: _list.length,
+                  );
+                },)
           ],
         ),
       ),

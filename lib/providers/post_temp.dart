@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import '../models/Post.dart';
+import '../models/post.dart';
 
 class PostProvider extends ChangeNotifier {
   List<dynamic> _post = [];

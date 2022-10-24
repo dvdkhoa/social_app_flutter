@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/postmodel.dart';
+import 'package:ltp/providers/navbar.dart';
 import 'package:ltp/utils/constants.dart';
+import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -12,7 +14,13 @@ class CustomDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final userLogin = GetStorage().read('userLogin');
-    print(userLogin);
+
+    final navBarProvider = Provider.of<NavBarProvider>(context, listen: false);
+
+    navBarProvider.setFollow(userLogin['userId']);
+
+    final followers = navBarProvider.getFollow();
+
 
     var postmodel = PostModel();
     return Container(
@@ -102,7 +110,8 @@ class CustomDrawer extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          postmodel.user.followers.text
+                          // postmodel.user.followers.text
+                          followers.text
                               .fontWeight(FontWeight.w600)
                               .minFontSize(Get.textScaleFactor * 18)
                               .make(),

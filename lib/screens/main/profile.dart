@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/postmodel.dart';
-import 'package:ltp/providers/posts.dart';
+import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:ltp/widgets/custom_post-widget.dart';
 import 'package:ltp/widgets/post_widget.dart';
@@ -29,22 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String userId = Get.arguments.toString();
 
-  List _list = [];
 
-  Future? _callAPI = null;
-
-  Future _callAPIWall() async {
-    var list = [];
-    final dio = Dio();
-    final res = await dio.get('https://10.0.2.2:7284/api/Post/GetWall?userId='+userId);
-
-    final map = Map<String, dynamic>.from(res.data);
-    print(map);
-    if(map['data'] != null)
-       list = map['data']  as List;
-
-    return list;
-  }
 
   Future _callAPIGetUser() async{
     final dio = Dio();
@@ -60,22 +45,17 @@ class _ProfilePageState extends State<ProfilePage> {
     // TODO: implement initState
     super.initState();
 
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+       final postProvider = Provider.of<PostsProvider>(context, listen: false);
+       postProvider.getWallFromServer(userId);
+     });
+
     _callAPIGetUser().then((user) {
       setState(() {
         _user = user;
         final map = Map<String, dynamic>.from(_user['followers']);
 
         isFollow = map.containsKey(userLogin['userId']);
-      });
-
-      _callAPI = _callAPIWall();
-
-      _callAPI?.then((list) {
-        setState(() {
-          print(list);
-          _list = list;
-          _list = _list.reversed.toList();
-        });
       });
     });
   }
@@ -209,10 +189,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                 height: Get.height * 0.04,
                                 width: Get.width * 0.2,
                                 color: kaccentColor,
-                                child: (!isFollow ? 'Follow':'Followed')
+                                child: !isFollow ? 'Follow'
                                     .text
                                     .color(Colors.white)
-                                    .makeCentered(),
+                                    .makeCentered()
+                                    : 'Followed'
+                                    .text
+                                    .color(Colors.white)
+                                    .makeCentered().backgroundColor(Colors.black38),
                               ),
                             ),
                           ),
@@ -248,59 +232,37 @@ class _ProfilePageState extends State<ProfilePage> {
               thickness: 1,
             ),
             'Posts'.text.minFontSize(18).letterSpacing(1).bold.makeCentered(),
-            _list.isEmpty
-                ? SizedBox(
-                    child: 'No Posts available'.text.makeCentered(),
-                    height: Get.height * 0.3,
-                  )
-                // : ListView.builder(
-                //     shrinkWrap: true,
-                //     physics: const NeverScrollableScrollPhysics(),
-                //     itemBuilder: (context, index) {
-                //       return index % 2 == 0
-                //           ? FadeInLeft(
-                //               duration: const Duration(milliseconds: 600),
-                //               from: 400,
-                //               child: PostWidget(
-                //                 datamodel: listp[index],
-                //                 index: index,
-                //               ),
-                //             )
-                //           : FadeInRight(
-                //               duration: const Duration(milliseconds: 600),
-                //               from: 400,
-                //               child: PostWidget(
-                //                 datamodel: listp[index],
-                //                 index: index,
-                //               ),
-                //             );
-                //     },
-                //     itemCount: listp.length,
-                //   ),
-            : ListView.builder(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: ((context, index) {
-                int actualindex = _list.length - index - 1;
-                return index % 2 == 0
-                    ? ElasticInLeft(
-                    duration: const Duration(milliseconds: 600),
-                    from: 400,
-                    child: CustomPostWidget(
-                      datamodel: _list[actualindex],
-                      index: actualindex,
-                    ))
-                    : ElasticInRight(
-                    duration: const Duration(milliseconds: 600),
-                    from: 400,
-                    child: CustomPostWidget(
-                      datamodel: _list[actualindex],
-                      index: actualindex,
-                    ));
-              }),
-              itemCount: _list.length,
-            ),
+             Consumer<PostsProvider>(builder: (context, value, child) {
+               return value.wall.isEmpty
+                   ? SizedBox(
+                 child: 'No Posts available'.text.makeCentered(),
+                 height: Get.height * 0.3,
+               )
+                   : ListView.builder(
+                 scrollDirection: Axis.vertical,
+                 shrinkWrap: true,
+                 physics: const NeverScrollableScrollPhysics(),
+                 itemBuilder: ((context, index) {
+                   int actualindex = value.wall.length - index - 1;
+                   return index % 2 == 0
+                       ? ElasticInLeft(
+                       duration: const Duration(milliseconds: 600),
+                       from: 400,
+                       child: CustomPostWidget(
+                         post: value.wall[actualindex],
+                         index: actualindex,
+                       ))
+                       : ElasticInRight(
+                       duration: const Duration(milliseconds: 600),
+                       from: 400,
+                       child: CustomPostWidget(
+                         post: value.wall[actualindex],
+                         index: actualindex,
+                       ));
+                 }),
+                 itemCount: value.wall.length,
+               );
+             },)
           ],
         ),
       ),
