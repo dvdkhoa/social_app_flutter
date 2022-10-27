@@ -90,4 +90,26 @@ class PostsProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+
+  Future<void> updatePost(String postId, String text) async{
+    await _postService.updatePost(postId, text);
+
+    final post = _news.where((post) => post.id == postId).first;
+    if(post == null)
+      return;
+    post.detail?.text = text;
+    post.meta?.updated = DateTime.now().toString();
+    notifyListeners();
+  }
+
+  Future<void> deletePost(String postId) async{
+    await _postService.deletePost(postId);
+
+    final post = _news.where((post) => post.id == postId).first;
+    if(post == null)
+      return;
+    _news.remove(post);
+    notifyListeners();
+  }
 }

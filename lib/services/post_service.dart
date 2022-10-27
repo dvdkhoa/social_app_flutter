@@ -30,4 +30,15 @@ class PostService {
     }
     return [];
   }
+
+  Future<void> updatePost(String postId, String text) async{
+    final res = await dio.put(
+        'https://10.0.2.2:7284/api/Post/UpdatePost?postId=${postId}&text=${text}');
+  }
+
+  Future<void> deletePost(String postId) async{
+    final res = await dio.delete(
+        'https://10.0.2.2:7284/api/Post/DeletePost?postId=${postId}');
+
+  }
 }

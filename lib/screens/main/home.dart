@@ -43,14 +43,14 @@ class _HomePageState extends State<HomePage> {
     });
 
 
-    _callAPI = _callAPIPost();
-
-    _callAPI?.then((list) {
-      setState(() {
-        _list = list;
-        _list = _list.reversed.toList();
-      });
-    });
+    // _callAPI = _callAPIPost();
+    //
+    // _callAPI?.then((list) {
+    //   setState(() {
+    //     _list = list;
+    //     _list = _list.reversed.toList();
+    //   });
+    // });
   }
 
 

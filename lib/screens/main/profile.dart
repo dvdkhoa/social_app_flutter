@@ -189,14 +189,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                 height: Get.height * 0.04,
                                 width: Get.width * 0.2,
                                 color: kaccentColor,
-                                child: !isFollow ? 'Follow'
+                                child: isFollow ? 'Followed'
                                     .text
                                     .color(Colors.white)
-                                    .makeCentered()
-                                    : 'Followed'
-                                    .text
-                                    .color(Colors.white)
-                                    .makeCentered().backgroundColor(Colors.black38),
+                                    .makeCentered().backgroundColor(Colors.black38)
+                                    : 'Follow'
+                                        .text
+                                        .color(Colors.white)
+                                        .makeCentered(),
                               ),
                             ),
                           ),

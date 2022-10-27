@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/post.dart';
-
-import 'package:ltp/providers/posts.dart';
+import 'package:ltp/providers/custom_posts.dart';
+import 'package:ltp/providers/post_temp.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:ltp/widgets/special_icon.dart';
 import 'package:provider/provider.dart';
@@ -30,11 +30,74 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
   late List<Likes> likes;
   late List<Comments> comments;
   late int likeCount;
+  late PostsProvider _postsProvider;
+  Offset _tapPosition = Offset.zero;
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _postsProvider = Provider.of<PostsProvider>(context,listen: false);
+  }
+
+
+  void _getTapPosition(TapDownDetails details) {
+    final RenderBox referenceBox = context.findRenderObject() as RenderBox;
+    setState(() {
+      _tapPosition = referenceBox.globalToLocal(details.globalPosition);
+    });
+  }
+
+  // This function will be called when you long press on the blue box or the image
+  void _showContextMenu(BuildContext context) async {
+    final RenderObject? overlay =
+    Overlay.of(context)?.context.findRenderObject();
+
+    final result = await showMenu(
+        context: context,
+
+        // Show the context menu at the tap location
+        position: RelativeRect.fromRect(
+            Rect.fromLTWH(_tapPosition.dx, _tapPosition.dy, 30, 30),
+            Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width,
+                overlay.paintBounds.size.height)),
+
+        // set a list of choices for the context menu
+        items: [
+          const PopupMenuItem(
+            value: 'edit',
+            child: Text('Edit'),
+          ),
+          const PopupMenuItem(
+            value: 'delete',
+            child: Text('Delete'),
+          ),
+
+        ]);
+
+    // Implement the logic for each choice here
+    switch (result) {
+      case 'edit':
+        // debugPrint('Add To Favorites');
+        Get.toNamed('/editpostpage', arguments: widget.post.id);
+        break;
+      case 'delete':
+        _postsProvider.deletePost(widget.post.id.toString());
+        break;
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     print('build');
+    final userLogin = GetStorage().read('userLogin');
+    bool isLike = false;
+    widget.post.likes?.forEach((element) {
+      if(userLogin['userId']==element.by!.id){
+        isLike = true;
+      }
+    });
 
     List<Photos>? photos = widget.post.detail?.photos;
     // likes = widget.datamodel['likes'];
@@ -117,6 +180,17 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                         ),
                       ]),
                 ),
+                SizedBox(width: 50,),
+              GestureDetector(
+                onTapDown: (details)  {
+                  _getTapPosition(details);
+                },
+                onLongPress: () async{
+                  _showContextMenu(context);
+                },
+
+                child: Icon(Icons.settings),
+              )
               ],
             ),
           ),
@@ -161,7 +235,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
             children: [
               SpecialIcon(
               val: likeCount.toString(),
-              iconData: Icons.favorite_border_outlined,
+              iconData: isLike ? Icons.color_lens_outlined : Icons.favorite_border_outlined,
               // ? Icons.favorite_border_outlined
               //     : Icons.favorite,
               color: likes.isEmpty ? kMainColor : kMainColor,
@@ -178,11 +252,15 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                 final map = Map<String,dynamic>.from(res.data);
                 print(map);
                 setState(() {
-                  print('222');
                   likeCount = map['data']['likeCount'] as int;
 
+                  if(isLike)
+                    likes.removeWhere((element) => element.by!.id == userLogin['userId']);
+                  else
+                    likes.add(Likes(by: By(id: userLogin['userId'])));
 
-                  likes.removeWhere((element) => element.by!.id == GetStorage().read('userLogin')['userId']);
+                  print('ngan');
+                  print(likes);
                   print(likeCount);
                 });
               },
@@ -196,7 +274,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                   },
                 ),
               SpecialIcon(
-                  val: '0',
+                  val: '',
                   iconData: Icons.repeat,
                   color: kmainColor,
                   doFunction: () {},
