@@ -143,7 +143,7 @@ class _PostScreenState extends State<PostScreen> {
                           padding: EdgeInsets.all(8.0),
                           child: Image.file(
                             imageFile!,
-                            width: Get.width * 0.7,
+                            width: Get.width * 0.5,
                           ),
                         ),
                       ),

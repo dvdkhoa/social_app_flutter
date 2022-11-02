@@ -15,6 +15,7 @@ import '../screens/auth/signin.dart';
 import '../screens/main/inbox.dart';
 import '../screens/main/myprofile.dart';
 import '../screens/main/notifications.dart';
+import '../screens/main/post_edit.dart';
 import '../screens/main/profile.dart';
 import '../screens/main/search.dart';
 import '../widgets/custom_comments.dart';
@@ -44,6 +45,10 @@ class RoutingPages {
     GetPage(
       name: '/postpage',
       page: () => const PostScreen(),
+    ),
+    GetPage(
+      name: '/editpostpage',
+      page: () => const EditPostScreen(),
     ),
     GetPage(
       name: '/profilepage',

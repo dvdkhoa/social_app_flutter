@@ -7,9 +7,8 @@ import 'package:velocity_x/velocity_x.dart';
 class CustomCommentBox extends StatelessWidget {
   const CustomCommentBox({Key? key, required this.msg, required this.imageUser, required this.userName})
       : super(key: key);
-  final String msg;
-  // final UserModel user;
 
+  final String msg;
   final String imageUser;
   final String userName;
 

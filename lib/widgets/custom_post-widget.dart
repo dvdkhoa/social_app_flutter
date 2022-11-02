@@ -2,8 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:ltp/models/postmodel.dart';
-import 'package:ltp/providers/posts.dart';
+import 'package:ltp/models/post.dart';
+import 'package:ltp/providers/custom_posts.dart';
+import 'package:ltp/providers/post_temp.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:ltp/widgets/special_icon.dart';
 import 'package:provider/provider.dart';
@@ -13,10 +14,11 @@ import 'package:velocity_x/velocity_x.dart';
 class CustomPostWidget extends StatefulWidget {
   CustomPostWidget({
     Key? key,
-    required this.datamodel,
+    required this.post,
     required this.index,
   }) : super(key: key);
-  dynamic datamodel;
+
+  PostModel post;
   int index;
 
   @override
@@ -25,22 +27,85 @@ class CustomPostWidget extends StatefulWidget {
 
 class _CustomPostWidgetState extends State<CustomPostWidget> {
 
-  late List likes;
+  late List<Likes> likes;
+  late List<Comments> comments;
   late int likeCount;
+  late PostsProvider _postsProvider;
+  Offset _tapPosition = Offset.zero;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _postsProvider = Provider.of<PostsProvider>(context,listen: false);
+  }
+
+
+  void _getTapPosition(TapDownDetails details) {
+    final RenderBox referenceBox = context.findRenderObject() as RenderBox;
+    setState(() {
+      _tapPosition = referenceBox.globalToLocal(details.globalPosition);
+    });
+  }
+
+  // This function will be called when you long press on the blue box or the image
+  void _showContextMenu(BuildContext context) async {
+    final RenderObject? overlay =
+    Overlay.of(context)?.context.findRenderObject();
+
+    final result = await showMenu(
+        context: context,
+
+        // Show the context menu at the tap location
+        position: RelativeRect.fromRect(
+            Rect.fromLTWH(_tapPosition.dx, _tapPosition.dy, 30, 30),
+            Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width,
+                overlay.paintBounds.size.height)),
+
+        // set a list of choices for the context menu
+        items: [
+          const PopupMenuItem(
+            value: 'edit',
+            child: Text('Edit'),
+          ),
+          const PopupMenuItem(
+            value: 'delete',
+            child: Text('Delete'),
+          ),
+
+        ]);
+
+    // Implement the logic for each choice here
+    switch (result) {
+      case 'edit':
+        // debugPrint('Add To Favorites');
+        Get.toNamed('/editpostpage', arguments: widget.post.id);
+        break;
+      case 'delete':
+        _postsProvider.deletePost(widget.post.id.toString());
+        break;
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     print('build');
+    final userLogin = GetStorage().read('userLogin');
+    bool isLike = false;
+    widget.post.likes?.forEach((element) {
+      if(userLogin['userId']==element.by!.id){
+        isLike = true;
+      }
+    });
 
-    print(widget.datamodel);
-
-    List photos = widget.datamodel['detail']['photos']!;
-    likes = widget.datamodel['likes'];
-    List comments = widget.datamodel['comments'];
+    List<Photos>? photos = widget.post.detail?.photos;
+    // likes = widget.datamodel['likes'];
+    // List comments = widget.datamodel['comments'];
+    likes = widget.post.likes!;
+    comments = widget.post.comments!;
 
     likeCount = likes.length;
-
-    print(photos);
 
     return Container(
       decoration: BoxDecoration(
@@ -68,7 +133,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                     backgroundColor: kaccentColor,
                     child: CircleAvatar(
                       backgroundImage:
-                      NetworkImage(widget.datamodel['by']['image']),
+                      NetworkImage(widget.post.by!.image ?? ""),
                       radius: 28,
                     ),
                   ),
@@ -79,7 +144,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        VxTextBuilder(widget.datamodel['by']['name'])
+                        VxTextBuilder(widget.post.by?.name ?? "")
                             .minFontSize(17)
                             .color(kMainColor)
                             .maxFontSize(18)
@@ -103,7 +168,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                             const SizedBox(
                               width: 2,
                             ),
-                            widget.datamodel['meta']['created']
+                            widget.post.meta!.created
                                 .toString()
                                 .text
                                 .letterSpacing(1)
@@ -115,6 +180,17 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                         ),
                       ]),
                 ),
+                SizedBox(width: 50,),
+              GestureDetector(
+                onTapDown: (details)  {
+                  _getTapPosition(details);
+                },
+                onLongPress: () async{
+                  _showContextMenu(context);
+                },
+
+                child: Icon(Icons.settings),
+              )
               ],
             ),
           ),
@@ -124,17 +200,30 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
             ),
             height: 10,
           ),
-          widget.datamodel['detail']['text'].toString().isEmptyOrNull
+          widget.post.detail!.text.toString().isEmptyOrNull
               ? Container()
               : Padding(
             padding:
             const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-            child: VxTextBuilder(widget.datamodel['detail']['text']).make(),
+            child: VxTextBuilder(widget.post.detail!.text.toString()).make(),
           ),
-          photos.length == 0
+          photos!.isEmpty
               ? Container()
-              // : Image.file(datamodel?['detail']['photos'][0]),
-              :Image.network("https://10.0.2.2:7284/"+photos[0]['url']),
+              : InkWell(
+                  child: Image.network("https://10.0.2.2:7284/" + photos![0].url.toString()),
+                  onTap: () {
+                    showDialog(context: context, builder: (context) => AlertDialog(
+                      content: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.network("https://10.0.2.2:7284/" + photos![0].url.toString(),
+                            fit: BoxFit.cover,
+                            height: 200,)
+                        ],
+                      ),
+                    ));
+                  },
+                ),
           const SizedBox(
             child: Divider(
               color: Colors.black38,
@@ -146,7 +235,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
             children: [
               SpecialIcon(
               val: likeCount.toString(),
-              iconData: Icons.favorite_border_outlined,
+              iconData: isLike ? Icons.color_lens_outlined : Icons.favorite_border_outlined,
               // ? Icons.favorite_border_outlined
               //     : Icons.favorite,
               color: likes.isEmpty ? kMainColor : kMainColor,
@@ -156,18 +245,22 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                 final res = await dio.post("https://10.0.2.2:7284/api/Post/Like",
                 data: {
                   "userId": GetStorage().read('userLogin')['userId'],
-                  "postId": widget.datamodel['id']
+                  "postId": widget.post.id
                 });
                 print('hello');
 
                 final map = Map<String,dynamic>.from(res.data);
                 print(map);
                 setState(() {
-                  print('222');
                   likeCount = map['data']['likeCount'] as int;
 
+                  if(isLike)
+                    likes.removeWhere((element) => element.by!.id == userLogin['userId']);
+                  else
+                    likes.add(Likes(by: By(id: userLogin['userId'])));
 
-                  likes.removeWhere((element) => element['by']['id'] == GetStorage().read('userLogin')['userId']);
+                  print('ngan');
+                  print(likes);
                   print(likeCount);
                 });
               },
@@ -177,11 +270,11 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                   iconData: Icons.comment_outlined,
                   color: kMainColor,
                   doFunction: () {
-                    Get.toNamed('/commentspage', arguments: widget.datamodel['id']);
+                    Get.toNamed('/commentspage', arguments: widget.post.id);
                   },
                 ),
               SpecialIcon(
-                  val: '0',
+                  val: '',
                   iconData: Icons.repeat,
                   color: kmainColor,
                   doFunction: () {},

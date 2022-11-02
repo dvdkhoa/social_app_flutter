@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:ltp/providers/posts.dart';
+import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/widgets/commentbox.dart';
 import 'package:ltp/widgets/inputtext.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +28,7 @@ class _CustomCommentsPageState extends State<CustomCommentsPage> {
   Future<List> _getCommentsFromServer(String postId) async{
     print('postId'+postId);
     final res = await Dio().get('https://10.0.2.2:7284/api/Post/Comments?postId=$postId');
-
+    await Future.delayed(Duration(seconds: 2));
     print('helo');
     print(res);
 
@@ -44,28 +44,30 @@ class _CustomCommentsPageState extends State<CustomCommentsPage> {
 
   @override
   void initState(){
+    super.initState();
 
-    _getCommentsFromServer(postId).then((list) {
-      setState(() {
-        _comments = list;
-        _isLoading = false;
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final PostsProvider _postProvider = Provider.of<PostsProvider>(context, listen: false);
+      _postProvider.getCommentsFromServer(postId);
     });
 
-    super.initState();
+    // _getCommentsFromServer(postId).then((list) {
+    //   setState(() {
+    //     _comments = list;
+    //     _isLoading = false;
+    //   });
+    // });
+
+
   }
 
   @override
   Widget build(BuildContext context) {
 
-    // final myprovider = Provider.of<PostsProvider>(context);
-    // var list = myprovider.getpostListing;
+    final postProvider = Provider.of<PostsProvider>(context, listen: false);
+
     final texteditingcontroller = TextEditingController();
-    // final postindex = Get.arguments;
-    //
-    // void addcommenttoList() {
-    //   myprovider.addCommenttoPost(postindex, texteditingcontroller.text);
-    // }
+
 
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(0.9),
@@ -80,24 +82,29 @@ class _CustomCommentsPageState extends State<CustomCommentsPage> {
           children: [
             SizedBox(
               height: Get.height * 0.8,
-              child: !_isLoading == true ?  ListView.builder(
-                itemBuilder: ((context, index) {
-                  return CustomCommentBox(
-                    msg: _comments[index]['text'],
-                    imageUser: _comments[index]['by']['image'],
-                    userName: _comments[index]['by']['name'],
+              child: Consumer<PostsProvider>(builder: (context, value, child) {
+                if(value.isLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
                   );
-                }),
-                itemCount: _comments.length,
-              )
-              : CircularProgressIndicator(),
-              //color: Colors.blue,
+                }
+                return ListView.builder(
+                  itemBuilder: ((context, index) {
+                    return CustomCommentBox(
+                      msg: value.comments[index].text.toString(),
+                      imageUser: value.comments[index].by!.image.toString(),
+                      userName: value.comments[index].by!.name.toString(),
+                    );
+                  }),
+                  itemCount: value.comments.length,
+                );
+              },)
             ),
             CustomTextInputWidget(
               msgController: texteditingcontroller,
-              // performFunc: addcommenttoList,
               performFunc: () {
-                _addComment(texteditingcontroller.text);
+                postProvider.addCommentToPost(texteditingcontroller.text, postId);
+                texteditingcontroller.text = "";
               },
             ),
           ],
@@ -106,27 +113,26 @@ class _CustomCommentsPageState extends State<CustomCommentsPage> {
     );
   }
 
-  void _addComment(String text) async {
-    final res = await Dio().post('https://10.0.2.2:7284/api/Post/Comment',
-    data: {
-      "userId": userLogin['userId'],
-      "postId": postId,
-      "text": text
-    }
-    );
-    if(res.statusCode == 200){
-      print('datares');
-
-      final map = Map<String, dynamic>.from(res.data);
-      
-      print(('data'));
-      print(map['data']);
-
-      final newComment = map['data'] as dynamic;
-      _comments.add(newComment);
-      setState(() {
-        print(_comments);
-      });
-    }
-  }
+  // void _addComment(String text) async {
+  //   final res = await Dio().post('https://10.0.2.2:7284/api/Post/Comment',
+  //   data: {
+  //     "userId": userLogin['userId'],
+  //     "postId": postId,
+  //     "text": text
+  //   }
+  //   );
+  //   if(res.statusCode == 200){
+  //
+  //     final map = Map<String, dynamic>.from(res.data);
+  //
+  //     print(('data'));
+  //     print(map['data']);
+  //
+  //     final newComment = map['data'] as dynamic;
+  //     _comments.add(newComment);
+  //     setState(() {
+  //       print(_comments);
+  //     });
+  //   }
+  // }
 }
