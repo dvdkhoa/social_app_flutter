@@ -5,7 +5,7 @@ import 'package:ltp/widgets/custom_post-widget.dart';
 
 class GetListView extends StatefulWidget{
 
-  List<PostModel> posts;
+  List<Post> posts;
 
   GetListView({required this.posts});
 

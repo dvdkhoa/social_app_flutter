@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/post.dart';
 
-import 'package:ltp/providers/posts.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:ltp/widgets/special_icon.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +17,7 @@ class CustomPostWidget extends StatefulWidget {
     required this.index,
   }) : super(key: key);
 
-  PostModel post;
+  Post post;
   int index;
 
   @override

@@ -1,26 +1,26 @@
-class PostModel {
+class Post {
   String? id;
   By? by;
-  int? type;
   Meta? meta;
+  int? type;
   Detail? detail;
   List<Comments>? comments;
   List<Likes>? likes;
 
-  PostModel(
+  Post(
       {this.id,
         this.by,
-        this.type,
         this.meta,
+        this.type,
         this.detail,
         this.comments,
         this.likes});
 
-  PostModel.fromJson(Map<String, dynamic> json) {
+  Post.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     by = json['by'] != null ? new By.fromJson(json['by']) : null;
-    type = json['type'];
     meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
+    type = json['type'];
     detail =
     json['detail'] != null ? new Detail.fromJson(json['detail']) : null;
     if (json['comments'] != null) {
@@ -43,10 +43,10 @@ class PostModel {
     if (this.by != null) {
       data['by'] = this.by!.toJson();
     }
-    data['type'] = this.type;
     if (this.meta != null) {
       data['meta'] = this.meta!.toJson();
     }
+    data['type'] = this.type;
     if (this.detail != null) {
       data['detail'] = this.detail!.toJson();
     }

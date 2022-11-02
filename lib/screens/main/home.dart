@@ -26,7 +26,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final userLogin = GetStorage().read('userLogin');
 
-  List<PostModel> _news = [];
+  List<Post> _news = [];
   
   List _list = [];
 

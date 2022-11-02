@@ -15,17 +15,17 @@ class PostsProvider extends ChangeNotifier {
   final PostService _postService = PostService();
   final CommentService _commentService = CommentService();
 
-  List<PostModel> _news = [];
-  List<PostModel> _wall = [];
-  List<PostModel> _myWall = [];
+  List<Post> _news = [];
+  List<Post> _wall = [];
+  List<Post> _myWall = [];
 
   List<Comments> _comments = [];
 
   bool isLoading = false;
 
-  List<PostModel> get news => _news;
-  List<PostModel> get wall => _wall;
-  List<PostModel> get myWall => _myWall;
+  List<Post> get news => _news;
+  List<Post> get wall => _wall;
+  List<Post> get myWall => _myWall;
 
   List<Comments> get comments => _comments;
 

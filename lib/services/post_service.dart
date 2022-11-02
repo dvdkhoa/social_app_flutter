@@ -4,18 +4,18 @@ import 'package:ltp/models/post.dart';
 class PostService {
   final dio = Dio();
 
-  Future<List<PostModel>> getNewsFromServer(String userId) async {
+  Future<List<Post>> getNewsFromServer(String userId) async {
     final res = await dio.get(
         'https://10.0.2.2:7284/api/Post/GetNews?userId=' + userId);
 
     List list = res.data['data'] as List;
 
-    List<PostModel> posts = list.map((e) => PostModel.fromJson(e)).toList();
+    List<Post> posts = list.map((e) => Post.fromJson(e)).toList();
 
     return posts;
   }
 
-  Future<List<PostModel>> getWallFromServer(String userId) async {
+  Future<List<Post>> getWallFromServer(String userId) async {
     final res = await dio.get(
         'https://10.0.2.2:7284/api/Post/GetWall?userId=' + userId);
 
@@ -24,7 +24,7 @@ class PostService {
     if(map['data'] != null) {
       List list = res.data['data'] as List;
 
-      List<PostModel> posts = list.map((e) => PostModel.fromJson(e)).toList();
+      List<Post> posts = list.map((e) => Post.fromJson(e)).toList();
 
       return posts;
     }
