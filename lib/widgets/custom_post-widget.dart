@@ -246,7 +246,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                         ),
                       ]),
                 ),
-                SizedBox(width: 50,),
+                SizedBox(width: 30,),
                 buildSettingButton()
               ],
             ),
@@ -309,7 +309,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
             children: [
               SpecialIcon(
               val: likeCount.toString(),
-              iconData: isLike ? Icons.color_lens_outlined : Icons.favorite_border_outlined,
+              iconData: isLike ? Icons.heart_broken : Icons.favorite_border_outlined,
               // ? Icons.favorite_border_outlined
               //     : Icons.favorite,
               color: likes.isEmpty ? kMainColor : kMainColor,

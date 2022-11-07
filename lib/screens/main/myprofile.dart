@@ -67,21 +67,20 @@ class _ProfilePageState extends State<myProfilePage> {
   Widget build(BuildContext context) {
     var postmodel = PostModel();
 
-    void _onButtonPressed(bool isChoose) {
+    void _onButtonPressed(bool isChoose, int change) {
       showModalBottomSheet(context: context, builder: (context){
-
         return Container(
           height: 150,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(30),
-                topRight: const Radius.circular(30),
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
               )
           ),
           child: Column(children: <Widget>[
             ListTile(
-              leading: Icon(Icons.heart_broken),
-              title: Text('Xem avata'),
+              leading: Icon(Icons.remove_red_eye),
+              title: change == 0 ? Text('View Avatar') : Text('View Background'),
               onTap:(){
                 if(isChoose){
                   showDialog(context: context, builder: (context) => AlertDialog(
@@ -92,12 +91,10 @@ class _ProfilePageState extends State<myProfilePage> {
                         Image.network(userLogin['profile']['image'],
                             fit: BoxFit.cover,
                             height: 200)
-
-
                       ],
                     ),
                   ));
-                }else{
+                } else{
                   showDialog(context: context, builder: (context) => AlertDialog(
                     content: Stack(
                       alignment: Alignment.center,
@@ -115,9 +112,10 @@ class _ProfilePageState extends State<myProfilePage> {
             ),
             ListTile(
               leading: Icon(Icons.file_upload),
-              title: Text('Đổi avata'),
+              title: change == 0 ? Text('Change Avatar') : Text('Change Background'),
               onTap:(){
-                Get.toNamed('/changeavata');
+                print('change '+change.toString());
+                Get.toNamed('/changeavata',arguments: change);
               },
             ),
           ],),
@@ -148,7 +146,7 @@ class _ProfilePageState extends State<myProfilePage> {
                 //     //   onTap: () => _onButtonPressed(),
                 //     // ),
                     InkWell(
-                      onTap: () => _onButtonPressed(false),
+                      onTap: () => _onButtonPressed(false, 1),
                       child: Container(
                         decoration: BoxDecoration(
                           color: Colors.white12,
@@ -172,7 +170,7 @@ class _ProfilePageState extends State<myProfilePage> {
                   child: Column(
                     children: [
                       InkWell(
-                        onTap: () => _onButtonPressed(true),
+                        onTap: () => _onButtonPressed(true, 0),
                         child: CircleAvatar(
                           backgroundColor: ktxtwhiteColor,
                           radius: Get.height * 0.105,

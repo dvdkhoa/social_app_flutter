@@ -19,6 +19,9 @@ class ChangeAvata extends StatefulWidget {
 }
 
 class _PostScreenState extends State<ChangeAvata> {
+  int change = Get.arguments;
+
+
   ImagePicker picker = ImagePicker();
 
   final userLogin = GetStorage().read("userLogin");
@@ -40,60 +43,25 @@ class _PostScreenState extends State<ChangeAvata> {
     });
   }
 
-  // void uploadIt() async {
-  //   var myPostModel = PostModel();
-  //   String texty = formController.text;
-  //
-  //   if (texty.isEmpty && imageFile == null) {
-  //     return;
-  //   } else {
-  //     if (texty.isNotEmpty) {
-  //       myPostModel.tweetText = texty;
-  //     } else {}
-  //     if (imageFile != null) {
-  //       myPostModel.tweetImage = imageFile;
-  //     } else {}
-  //     myPostModel.uploadTime = DateFormat.yMEd().format(DateTime.now());
-  //     Get.back(result: myPostModel);
-  //   }
-  // }
 
   void uploadPost() async{
     // print(userLogin['userId']);
-    dio.FormData formData ;
+    dio.FormData? formData ;
     if (imageFile != null) {
-      // print('imagefile khong null');
       String? fileName = imageFile?.path.split('/').last;
 
       final file = await dio.MultipartFile.fromFile(imageFile!.path, filename: fileName);
 
-      // print(file);
-      // print('filepath: ${imageFile!.path}');
-
       formData = dio.FormData.fromMap({
         "UserId": userLogin['userId'],
-        "Text": formController.text,
         "PhotoFile": file,
       });
-    }else {
-      // print('imagefile null');
-
-      formData = dio.FormData.fromMap({
-        "UserId": userLogin['userId'],
-        "Text": formController.text,
-      });
     }
-    // print('file upload');
-    // print(imageFile);
-
-    final res = await dio.Dio().post("https://10.0.2.2:7284/api/Post/CreatePost",
-      data: formData,
-      //   onSendProgress: (send, total) {
-      // // print("send: $send, total: $total");
-      //   }
-    );
-
-    print(res);
+    if(formData != null){
+      final res = await dio.Dio().post("",
+        data: formData,
+      );
+    }
 
     Get.back();
   }
@@ -104,7 +72,8 @@ class _PostScreenState extends State<ChangeAvata> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         centerTitle: true,
-        title: 'Change Screen'.text.make(),
+        title: change == 0 ? 'Change Avatar'.text.make()
+                            : 'Change Background'.text.make(),
       ),
       body: SizedBox(
         child: Form(
