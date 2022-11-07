@@ -12,6 +12,7 @@ import 'package:ltp/screens/splash.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/auth/signin.dart';
+import '../screens/main/change_avata.dart';
 import '../screens/main/inbox.dart';
 import '../screens/main/myprofile.dart';
 import '../screens/main/notifications.dart';
@@ -71,6 +72,12 @@ class RoutingPages {
       name: '/inboxpage',
       page: () => const InboxPage(),
     ),
+
+    GetPage(
+      name: '/changeavata',
+      page: () => const ChangeAvata(),
+    ),
+
     GetPage(
       name: '/commentspage',
       page: () => CustomCommentsPage(),
