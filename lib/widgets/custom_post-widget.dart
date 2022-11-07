@@ -6,9 +6,11 @@ import 'package:ltp/models/post.dart';
 import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/providers/post_temp.dart';
 import 'package:ltp/utils/constants.dart';
+import 'package:ltp/widgets/asset_player_widget.dart';
 import 'package:ltp/widgets/special_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:video_player/video_player.dart';
 
 // ignore: must_be_immutable
 class CustomPostWidget extends StatefulWidget {
@@ -33,19 +35,51 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
   late PostsProvider _postsProvider;
   Offset _tapPosition = Offset.zero;
 
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _postsProvider = Provider.of<PostsProvider>(context,listen: false);
+
+    final postFile = widget.post.detail?.postFiles;
+
   }
 
 
   void _getTapPosition(TapDownDetails details) {
+    print('tap nhe');
     final RenderBox referenceBox = context.findRenderObject() as RenderBox;
     setState(() {
+      print(_tapPosition);
       _tapPosition = referenceBox.globalToLocal(details.globalPosition);
     });
+  }
+
+  // _showPopupMenu() async {
+  //   final RenderBox referenceBox = context.findRenderObject() as RenderBox;
+  //   final RenderObject? overlay =
+  //   Overlay.of(context)?.context.findRenderObject();
+  //   await showMenu(
+  //     context: context,
+  //     position: RelativeRect.fromRect(
+  //         _tapPosition & Size(40, 40), // smaller rect, the touch area
+  //         Offset.zero & overlay?.size // Bigger rect, the entire screen
+  //     ),
+  //     items: [
+  //       PopupMenuItem(
+  //         child: Text("Show Usage"),
+  //       ),
+  //       PopupMenuItem(
+  //         child: Text("Delete"),
+  //       ),
+  //     ],
+  //     elevation: 8.0,
+  //   );
+  // }
+
+  void _storePosition(TapDownDetails details) {
+    _tapPosition = details.globalPosition;
   }
 
   // This function will be called when you long press on the blue box or the image
@@ -53,11 +87,15 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
     final RenderObject? overlay =
     Overlay.of(context)?.context.findRenderObject();
 
+
+
     final result = await showMenu(
         context: context,
 
         // Show the context menu at the tap location
-        position: RelativeRect.fromRect(
+        position:
+        // RelativeRect.fromLTRB(200, 150, 100, 100),
+        RelativeRect.fromRect(
             Rect.fromLTWH(_tapPosition.dx, _tapPosition.dy, 30, 30),
             Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width,
                 overlay.paintBounds.size.height)),
@@ -78,7 +116,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
     // Implement the logic for each choice here
     switch (result) {
       case 'edit':
-        // debugPrint('Add To Favorites');
+      // debugPrint('Add To Favorites');
         Get.toNamed('/editpostpage', arguments: widget.post.id);
         break;
       case 'delete':
@@ -87,6 +125,11 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
 
     }
   }
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -99,13 +142,36 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
       }
     });
 
-    List<Photos>? photos = widget.post.detail?.photos;
+    List<PostFiles>? postFiles = widget.post.detail?.postFiles;
+
+
     // likes = widget.datamodel['likes'];
     // List comments = widget.datamodel['comments'];
     likes = widget.post.likes!;
     comments = widget.post.comments!;
 
     likeCount = likes.length;
+    if(!postFiles!.isEmpty){
+      print(postFiles![0].url.toString());
+    }
+
+
+    Widget buildSettingButton() {
+      if(userLogin['userId'] == widget.post.by!.id) {
+        return GestureDetector(
+          onTapDown: (details)  {
+            _getTapPosition(details);
+            _showContextMenu(context);
+          },
+          // onLongPress: () async{
+          //   _showContextMenu(context);
+          // },
+
+          child: Icon(Icons.settings),
+        );
+      }
+      return Container();
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -181,16 +247,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                       ]),
                 ),
                 SizedBox(width: 50,),
-              GestureDetector(
-                onTapDown: (details)  {
-                  _getTapPosition(details);
-                },
-                onLongPress: () async{
-                  _showContextMenu(context);
-                },
-
-                child: Icon(Icons.settings),
-              )
+                buildSettingButton()
               ],
             ),
           ),
@@ -207,23 +264,40 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
             const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
             child: VxTextBuilder(widget.post.detail!.text.toString()).make(),
           ),
-          photos!.isEmpty
+          postFiles?.length == 0
               ? Container()
-              : InkWell(
-                  child: Image.network("https://10.0.2.2:7284/" + photos![0].url.toString()),
-                  onTap: () {
-                    showDialog(context: context, builder: (context) => AlertDialog(
-                      content: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Image.network("https://10.0.2.2:7284/" + photos![0].url.toString(),
-                            fit: BoxFit.cover,
-                            height: 200,)
-                        ],
-                      ),
-                    ));
-                  },
-                ),
+              :  (postFiles![0].fileType == 0
+                ? InkWell(
+                    child: Image.network(postFiles![0].url.toString()),
+                    // : AssetPlayerWidget(url: "https://10.0.2.2:7284/" + postFiles![0].url.toString()),
+                      onTap: () {
+                        showDialog(context: context, builder: (context) => AlertDialog(
+                          content: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Image.network(postFiles![0].url.toString(),
+                                fit: BoxFit.cover,
+                                height: 200,)
+                            ],
+                          ),
+                        ));
+                      },
+                    )
+                : InkWell(
+                    // child: AssetPlayerWidget(url: 'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'),
+                        child: AssetPlayerWidget(url: postFiles![0].url.toString(),),
+                    onLongPress: () {
+                      showDialog(context: context, builder: (context) => AlertDialog(
+                        content: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            AssetPlayerWidget(url: postFiles![0].url.toString())
+                          ],
+                        ),
+                      ));
+                    },
+                  )
+          ) ,
           const SizedBox(
             child: Divider(
               color: Colors.black38,
