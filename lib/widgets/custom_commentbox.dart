@@ -53,7 +53,7 @@ class CustomCommentBox extends StatelessWidget {
                       width: 5,
                     ),
                     FittedBox(
-                      child: msg.text
+                      child: msg?.text
                           .align(TextAlign.start)
                           .color(Colors.white)
                           .fontWeight(FontWeight.w400)

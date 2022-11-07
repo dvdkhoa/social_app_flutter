@@ -8,7 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ltp/models/postmodel.dart';
 import 'package:ltp/utils/constants.dart';
+import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
+
+import '../../providers/custom_posts.dart';
 
 // ignore: must_be_immutable
 class PostScreen extends StatefulWidget {
@@ -19,6 +22,8 @@ class PostScreen extends StatefulWidget {
 }
 
 class _PostScreenState extends State<PostScreen> {
+  late PostsProvider postsProvider;
+
   ImagePicker picker = ImagePicker();
 
   final userLogin = GetStorage().read("userLogin");
@@ -26,6 +31,16 @@ class _PostScreenState extends State<PostScreen> {
 
   File? imageFile;
   var formController = TextEditingController();
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      postsProvider = Provider.of<PostsProvider>(context, listen: false);
+    });
+  }
 
   Future chooseImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -59,41 +74,23 @@ class _PostScreenState extends State<PostScreen> {
   // }
   
   void uploadPost() async{
-    // print(userLogin['userId']);
     dio.FormData formData ;
     if (imageFile != null) {
-      // print('imagefile khong null');
       String? fileName = imageFile?.path.split('/').last;
 
       final file = await dio.MultipartFile.fromFile(imageFile!.path, filename: fileName);
-
-      // print(file);
-      // print('filepath: ${imageFile!.path}');
-
        formData = dio.FormData.fromMap({
         "UserId": userLogin['userId'],
         "Text": formController.text,
         "PhotoFile": file,
       });
     }else {
-      // print('imagefile null');
-
       formData = dio.FormData.fromMap({
         "UserId": userLogin['userId'],
         "Text": formController.text,
       });
     }
-    // print('file upload');
-    // print(imageFile);
-
-    final res = await dio.Dio().post("https://10.0.2.2:7284/api/Post/CreatePost",
-        data: formData,
-      //   onSendProgress: (send, total) {
-      // // print("send: $send, total: $total");
-      //   }
-    );
-
-    print(res);
+    await postsProvider.creatPost(formData);
 
     Get.back();
   }

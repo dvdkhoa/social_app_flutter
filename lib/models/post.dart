@@ -109,16 +109,16 @@ class Meta {
 
 class Detail {
   String? text;
-  List<Photos>? photos;
+  List<PostFiles>? postFiles;
 
-  Detail({this.text, this.photos});
+  Detail({this.text, this.postFiles});
 
   Detail.fromJson(Map<String, dynamic> json) {
     text = json['text'];
-    if (json['photos'] != null) {
-      photos = <Photos>[];
-      json['photos'].forEach((v) {
-        photos!.add(new Photos.fromJson(v));
+    if (json['postFiles'] != null) {
+      postFiles = <PostFiles>[];
+      json['postFiles'].forEach((v) {
+        postFiles!.add(new PostFiles.fromJson(v));
       });
     }
   }
@@ -126,28 +126,31 @@ class Detail {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['text'] = this.text;
-    if (this.photos != null) {
-      data['photos'] = this.photos!.map((v) => v.toJson()).toList();
+    if (this.postFiles != null) {
+      data['postFiles'] = this.postFiles!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
-class Photos {
+class PostFiles {
   String? id;
   String? url;
+  int? fileType;
 
-  Photos({this.id, this.url});
+  PostFiles({this.id, this.url, this.fileType});
 
-  Photos.fromJson(Map<String, dynamic> json) {
+  PostFiles.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     url = json['url'];
+    fileType = json['fileType'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['url'] = this.url;
+    data['fileType'] = this.fileType;
     return data;
   }
 }

@@ -8,11 +8,15 @@ class PostService {
     final res = await dio.get(
         'https://10.0.2.2:7284/api/Post/GetNews?userId=' + userId);
 
-    List list = res.data['data'] as List;
-
-    List<PostModel> posts = list.map((e) => PostModel.fromJson(e)).toList();
-
-    return posts;
+    if(res.data['data'] != null)
+    {
+      print(res.data);
+      List list = res.data['data'] as List;
+      List<PostModel> posts = list.map((e) => PostModel.fromJson(e)).toList();
+      return posts;
+    }
+    else
+      return [];
   }
 
   Future<List<PostModel>> getWallFromServer(String userId) async {
@@ -37,8 +41,23 @@ class PostService {
   }
 
   Future<void> deletePost(String postId) async{
+    print("delete: "+postId);
     final res = await dio.delete(
         'https://10.0.2.2:7284/api/Post/DeletePost?postId=${postId}');
 
+  }
+
+  Future<PostModel> creatPost (FormData formData) async {
+    final res = await dio.post("https://10.0.2.2:7284/api/Post/CreatePost",
+      data: formData,
+    );
+
+    if(res.statusCode == 200) {
+      final newPostJson = res.data['data'];
+      final PostModel postModel = PostModel.fromJson(newPostJson);
+
+      return postModel;
+    }
+    throw Exception('Create post failed!!!');
   }
 }
