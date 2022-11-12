@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import '../models/user_login.dart';
 
 
 class CommonProvider  extends ChangeNotifier {
-  List _users = [];
+  late User _user;
 
-  void addAllUser(List users){
-    _users = users;
-    notifyListeners();
+  User get getUser{
+    _user = User.fromJson( GetStorage().read('userLogin'));
+    return _user;
   }
 
-  List getUserList() {
-    return _users;
+  void setUser(User user){
+    _user = user;
+    GetStorage().write('userLogin', _user.toJson());
+    notifyListeners();
   }
 }

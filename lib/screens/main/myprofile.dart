@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/postmodel.dart';
+import 'package:ltp/providers/common_provider.dart';
 import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:ltp/widgets/custom_post-widget.dart';
 import 'package:ltp/widgets/post_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../../models/user_login.dart';
 
 class myProfilePage extends StatefulWidget {
   myProfilePage({Key? key}) : super(key: key);
@@ -65,6 +67,10 @@ class _ProfilePageState extends State<myProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+
+    final commonProvider = Provider.of<CommonProvider>(context, listen: true);
+    User user = commonProvider.getUser;
+
     var postmodel = PostModel();
 
     void _onButtonPressed(bool isChoose, int change) {
@@ -88,7 +94,7 @@ class _ProfilePageState extends State<myProfilePage> {
                       alignment: Alignment.center,
                       children: [
 
-                        Image.network(userLogin['profile']['image'],
+                        Image.network(user.profile!.image.toString(),
                             fit: BoxFit.cover,
                             height: 200)
                       ],

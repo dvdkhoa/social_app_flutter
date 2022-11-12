@@ -9,7 +9,10 @@ import 'package:intl/intl.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:ltp/models/postmodel.dart';
 import 'package:ltp/utils/constants.dart';
+import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../../models/user_login.dart';
+import '../../providers/common_provider.dart';
 
 // ignore: must_be_immutable
 class ChangeAvata extends StatefulWidget {
@@ -21,6 +24,8 @@ class ChangeAvata extends StatefulWidget {
 
 class _PostScreenState extends State<ChangeAvata> {
   int change = Get.arguments;
+
+  late CommonProvider common_provider;
 
 
   ImagePicker picker = ImagePicker();
@@ -44,6 +49,14 @@ class _PostScreenState extends State<ChangeAvata> {
     });
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      common_provider = Provider.of<CommonProvider>(context, listen: false);
+    });
+  }
 
   void uploadPost() async{
     // print(userLogin['userId']);
@@ -54,15 +67,22 @@ class _PostScreenState extends State<ChangeAvata> {
       final file = await dio.MultipartFile.fromFile(imageFile!.path, filename: fileName);
 
       formData = dio.FormData.fromMap({
-        "PhotoFile": file,
+        "file": file,
       });
     }
     if(formData != null){
       context.loaderOverlay.show();
-      final res = await dio.Dio().put("https://10.0.0.2:7284/api/Account/ChangeAvatar?"+userLogin['userId'],
+      final res = await dio.Dio().put("https://10.0.2.2:7284/api/Account/ChangeAvatar?userId="+userLogin['userId'],
         data: formData,
       );
-      print(res);
+      print(res.data);
+      print(res.data['data']);
+
+      User user = User.fromJson(userLogin);
+
+      user.profile!.image = res.data['data'];
+
+      common_provider.setUser(user);
     }
     context.loaderOverlay.hide();
 
