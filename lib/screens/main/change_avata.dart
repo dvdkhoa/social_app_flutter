@@ -6,6 +6,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:ltp/models/postmodel.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -53,90 +54,94 @@ class _PostScreenState extends State<ChangeAvata> {
       final file = await dio.MultipartFile.fromFile(imageFile!.path, filename: fileName);
 
       formData = dio.FormData.fromMap({
-        "UserId": userLogin['userId'],
         "PhotoFile": file,
       });
     }
     if(formData != null){
-      final res = await dio.Dio().post("",
+      context.loaderOverlay.show();
+      final res = await dio.Dio().put("https://10.0.0.2:7284/api/Account/ChangeAvatar?"+userLogin['userId'],
         data: formData,
       );
+      print(res);
     }
+    context.loaderOverlay.hide();
 
     Get.back();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        centerTitle: true,
-        title: change == 0 ? 'Change Avatar'.text.make()
-                            : 'Change Background'.text.make(),
-      ),
-      body: SizedBox(
-        child: Form(
-          child: Column(
-            children: [
-              Padding(
-                padding:
-                const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                child: Container(
+    return LoaderOverlay(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          centerTitle: true,
+          title: change == 0 ? 'Change Avatar'.text.make()
+                              : 'Change Background'.text.make(),
+        ),
+        body: SizedBox(
+          child: Form(
+            child: Column(
+              children: [
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                  child: Container(
 
+                  ),
                 ),
-              ),
-              InkWell(
-                onTap: () {
-                  chooseImage();
-                },
-                child: imageFile == null
-                    ? Container(
-                  margin: const EdgeInsets.only(top: 200),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Icon(
-                          Icons.upload_outlined,
-                          size: 50,
-                          color: kMainColor,
-                        ),
-                        'Select Image'.text.make(),
-                      ]),
-                )
-                    : Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Image.file(
-                      imageFile!,
-                      width: Get.width * 0.5,
+                InkWell(
+                  onTap: () {
+                    chooseImage();
+                  },
+                  child: imageFile == null
+                      ? Container(
+                    margin: const EdgeInsets.only(top: 200),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Icon(
+                            Icons.upload_outlined,
+                            size: 50,
+                            color: kMainColor,
+                          ),
+                          'Select Image'.text.make(),
+                        ]),
+                  )
+                      : Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Image.file(
+                        imageFile!,
+                        width: Get.width * 0.5,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const Spacer(),
-              Container(
-                width: Get.width * 0.7,
-                height: Get.height * 0.1,
-                padding: const EdgeInsets.only(
-                  bottom: 30,
+                const Spacer(),
+                Container(
+                  width: Get.width * 0.7,
+                  height: Get.height * 0.1,
+                  padding: const EdgeInsets.only(
+                    bottom: 30,
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () async{
+                      // uploadIt();
+                      uploadPost();
+                    },
+                    child: 'Upload'
+                        .text
+                        .minFontSize(20)
+                        .fontWeight(FontWeight.w500)
+                        .make(),
+                  ),
                 ),
-                child: ElevatedButton(
-                  onPressed: () async{
-                    // uploadIt();
-                    uploadPost();
-                  },
-                  child: 'Upload'
-                      .text
-                      .minFontSize(20)
-                      .fontWeight(FontWeight.w500)
-                      .make(),
+                SizedBox(
+                  height: Get.height * 0.025,
                 ),
-              ),
-              SizedBox(
-                height: Get.height * 0.025,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

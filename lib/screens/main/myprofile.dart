@@ -239,21 +239,21 @@ class _ProfilePageState extends State<myProfilePage> {
                                   ),
                                 ]),
                           ),
-                          InkWell(
-                            onTap: () {},
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                height: Get.height * 0.04,
-                                width: Get.width * 0.2,
-                                color: kaccentColor,
-                                child: 'Follow'
-                                    .text
-                                    .color(Colors.white)
-                                    .makeCentered(),
-                              ),
-                            ),
-                          ),
+                          // InkWell(
+                          //   onTap: () {},
+                          //   child: ClipRRect(
+                          //     borderRadius: BorderRadius.circular(8),
+                          //     child: Container(
+                          //       height: Get.height * 0.04,
+                          //       width: Get.width * 0.2,
+                          //       color: kaccentColor,
+                          //       child: 'Follow'
+                          //           .text
+                          //           .color(Colors.white)
+                          //           .makeCentered(),
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ],
