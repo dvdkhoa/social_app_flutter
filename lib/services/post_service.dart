@@ -5,6 +5,7 @@ class PostService {
   final dio = Dio();
 
   Future<List<PostModel>> getNewsFromServer(String userId) async {
+    print("UserId: "+userId);
     final res = await dio.get(
         'https://10.0.2.2:7284/api/Post/GetNews?userId=' + userId);
 

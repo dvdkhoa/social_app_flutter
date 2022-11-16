@@ -50,7 +50,7 @@ class Meta {
 class Profile {
   String? name;
   String? image;
-  Null? background;
+  String? background;
   String? gender;
 
   Profile({this.name, this.image, this.background, this.gender});

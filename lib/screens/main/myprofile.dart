@@ -52,7 +52,8 @@ class _ProfilePageState extends State<myProfilePage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final postProvider = Provider.of<PostsProvider>(context, listen: false);
-      postProvider.getMyWallFromServer();
+      final user = User.fromJson(GetStorage().read("userLogin"));
+      postProvider.getMyWallFromServer(user.userId.toString());
     });
 
     _callAPI = _callAPIPost();

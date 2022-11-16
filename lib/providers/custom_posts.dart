@@ -11,7 +11,7 @@ import 'package:ltp/services/post_service.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class PostsProvider extends ChangeNotifier {
-  final userLogin = GetStorage().read('userLogin');
+  // final userLogin = GetStorage().read('userLogin');
 
   final PostService _postService = PostService();
   final CommentService _commentService = CommentService();
@@ -42,11 +42,11 @@ class PostsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getNewsFromServer() async{
+  Future<void> getNewsFromServer(String userId) async{
     isLoading = true;
     notifyListeners();
 
-    _news = (await _postService.getNewsFromServer(userLogin['userId'])).reversed.toList();
+    _news = (await _postService.getNewsFromServer(userId)).reversed.toList();
     isLoading = false;
     notifyListeners();
   }
@@ -60,12 +60,21 @@ class PostsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getMyWallFromServer() async{
+  Future<void> getMyWallFromServer(String userId) async{
     isLoading = true;
     notifyListeners();
 
-    _myWall = (await _postService.getWallFromServer(userLogin['userId'])).reversed.toList();
+    _myWall = (await _postService.getWallFromServer(userId)).reversed.toList();
     isLoading = false;
+    notifyListeners();
+  }
+
+  void clearMemory(){
+    _news.clear();
+    _wall.clear();
+    _myWall.clear();
+    _comments.clear();
+
     notifyListeners();
   }
 
@@ -81,10 +90,10 @@ class PostsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addCommentToPost(String text, String postId) async {
+  Future<void> addCommentToPost(String text, String postId, String userId) async {
     final res = await Dio().post('https://10.0.2.2:7284/api/Post/Comment',
         data: {
-          "userId": userLogin['userId'],
+          "userId": userId,
           "postId": postId,
           "text": text
         }
