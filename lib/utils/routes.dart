@@ -12,10 +12,12 @@ import 'package:ltp/screens/splash.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/auth/signin.dart';
+import '../screens/main/change_avata.dart';
 import '../screens/main/inbox.dart';
 import '../screens/main/myprofile.dart';
 import '../screens/main/notifications.dart';
 import '../screens/main/post_edit.dart';
+import '../screens/main/postvideo.dart';
 import '../screens/main/profile.dart';
 import '../screens/main/search.dart';
 import '../widgets/custom_comments.dart';
@@ -70,6 +72,12 @@ class RoutingPages {
       name: '/inboxpage',
       page: () => const InboxPage(),
     ),
+
+    GetPage(
+      name: '/changeavata',
+      page: () => const ChangeAvata(),
+    ),
+
     GetPage(
       name: '/commentspage',
       page: () => CustomCommentsPage(),

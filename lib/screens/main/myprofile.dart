@@ -67,6 +67,69 @@ class _ProfilePageState extends State<myProfilePage> {
   Widget build(BuildContext context) {
     var postmodel = PostModel();
 
+    void _onButtonPressed(bool isChoose) {
+      showModalBottomSheet(context: context, builder: (context){
+
+        return Container(
+          height: 150,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(30),
+                topRight: const Radius.circular(30),
+              )
+          ),
+          child: Column(children: <Widget>[
+            ListTile(
+              leading: Icon(Icons.heart_broken),
+              title: Text('Xem avata'),
+              onTap:(){
+                if(isChoose){
+                  showDialog(context: context, builder: (context) => AlertDialog(
+                    content: Stack(
+                      alignment: Alignment.center,
+                      children: [
+
+                        Image.network(userLogin['profile']['image'],
+                            fit: BoxFit.cover,
+                            height: 200)
+
+
+                      ],
+                    ),
+                  ));
+                }else{
+                  showDialog(context: context, builder: (context) => AlertDialog(
+                    content: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.network(postmodel.user.bannerImage,
+                            fit: BoxFit.cover,
+                            height: 200)
+                      ],
+                    ),
+                  ));
+                }
+
+                // Get.toNamed('/changeavata');
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.file_upload),
+              title: Text('Đổi avata'),
+              onTap:(){
+                Get.toNamed('/changeavata');
+              },
+            ),
+          ],),
+        );
+      });
+    }
+
+
+
+
+
+
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(0.9),
       body: SingleChildScrollView(
@@ -79,31 +142,46 @@ class _ProfilePageState extends State<myProfilePage> {
                 Container(
                   height: Get.height * 0.5,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white12,
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        postmodel.user.bannerImage,
+                // Column(
+                //   children: [
+                //     // InkWell(
+                //     //   onTap: () => _onButtonPressed(),
+                //     // ),
+                    InkWell(
+                      onTap: () => _onButtonPressed(false),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white12,
+                          image: DecorationImage(
+                            image: NetworkImage(
+                              postmodel.user.bannerImage,
+                            ),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        height: Get.height * 0.25,
                       ),
-                      fit: BoxFit.cover,
                     ),
-                  ),
-                  height: Get.height * 0.25,
-                ),
+                //   ],
+                // ),
+
                 Positioned(
                   left: Get.width * 0.2,
                   right: Get.width * 0.2,
                   bottom: 15,
                   child: Column(
                     children: [
-                      CircleAvatar(
-                        backgroundColor: ktxtwhiteColor,
-                        radius: Get.height * 0.105,
+                      InkWell(
+                        onTap: () => _onButtonPressed(true),
                         child: CircleAvatar(
-                          backgroundImage:
-                          NetworkImage(userLogin['profile']['image']),
-                          radius: Get.height * 0.1,
+                          backgroundColor: ktxtwhiteColor,
+                          radius: Get.height * 0.105,
+
+                          child: CircleAvatar(
+                            backgroundImage:
+                            NetworkImage(userLogin['profile']['image']),
+                            radius: Get.height * 0.1,
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -262,4 +340,10 @@ class _ProfilePageState extends State<myProfilePage> {
       ),
     );
   }
+
+
+
+
 }
+
+

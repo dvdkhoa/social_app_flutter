@@ -52,7 +52,7 @@ class WrapperManager extends StatelessWidget {
           ),
         ],
       ),
-      body: const BodyWidget(),
+      body: BodyWidget(),
       bottomNavigationBar: const BottomNavBar(),
       floatingActionButton: const CustomFloatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,

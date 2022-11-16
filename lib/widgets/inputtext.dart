@@ -18,7 +18,7 @@ class CustomTextInputWidget extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.only(top: 5, bottom: 1, left: 10),
-          margin: const EdgeInsets.only(left: 8),
+          margin: const EdgeInsets.only(left: 8, bottom: 10),
           height: Get.height * 0.06,
           width: Get.width * 0.8,
           decoration: BoxDecoration(
@@ -33,17 +33,21 @@ class CustomTextInputWidget extends StatelessWidget {
             controller: msgController,
             decoration: const InputDecoration(
               border: InputBorder.none,
-              hintText: 'Viết gì đó'
+              hintText: 'Write here....',
+
             ),
           ),
         ),
-        InkWell(
-          onTap: performFunc,
-          child: const CircleAvatar(
-            radius: 23,
-            child: Icon(
-              Icons.send,
-              size: 28,
+        Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          child: InkWell(
+            onTap: performFunc,
+            child: const CircleAvatar(
+              radius: 23,
+              child: Icon(
+                Icons.send,
+                size: 28,
+              ),
             ),
           ),
         ),

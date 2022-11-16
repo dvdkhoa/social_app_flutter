@@ -80,25 +80,26 @@ class _CustomCommentsPageState extends State<CustomCommentsPage> {
         reverse: true,
         child: Column(
           children: [
+            // SizedBox(height: Get.height * 0.2,),
             SizedBox(
-              height: Get.height * 0.8,
-              child: Consumer<PostsProvider>(builder: (context, value, child) {
-                if(value.isLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                return ListView.builder(
-                  itemBuilder: ((context, index) {
-                    return CustomCommentBox(
-                      msg: value.comments[index].text.toString(),
-                      imageUser: value.comments[index].by!.image.toString(),
-                      userName: value.comments[index].by!.name.toString(),
+                height: Get.height * 0.8,
+                child: Consumer<PostsProvider>(builder: (context, value, child) {
+                  if(value.isLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
                     );
-                  }),
-                  itemCount: value.comments.length,
-                );
-              },)
+                  }
+                  return ListView.builder(
+                    itemBuilder: ((context, index) {
+                      return CustomCommentBox(
+                        msg: value.comments[index].text.toString(),
+                        imageUser: value.comments[index].by!.image.toString(),
+                        userName: value.comments[index].by!.name.toString(),
+                      );
+                    }),
+                    itemCount: value.comments.length,
+                  );
+                },)
             ),
             CustomTextInputWidget(
               msgController: texteditingcontroller,

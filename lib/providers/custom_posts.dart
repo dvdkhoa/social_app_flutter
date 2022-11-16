@@ -8,6 +8,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/post.dart';
 import 'package:ltp/services/comment_service.dart';
 import 'package:ltp/services/post_service.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 class PostsProvider extends ChangeNotifier {
   final userLogin = GetStorage().read('userLogin');
@@ -30,6 +31,16 @@ class PostsProvider extends ChangeNotifier {
   List<Comments> get comments => _comments;
 
 
+  Future<void> creatPost(FormData formData) async {
+    final PostModel newPost =(await _postService.creatPost(formData));
+
+    print('trước: '+_news.length.toString());
+    _news.add(newPost);
+    _myWall.add(newPost);
+    print('sau: '+_news.length.toString());
+
+    notifyListeners();
+  }
 
   Future<void> getNewsFromServer() async{
     isLoading = true;
@@ -110,6 +121,7 @@ class PostsProvider extends ChangeNotifier {
     if(post == null)
       return;
     _news.remove(post);
+    _myWall.remove(post);
     notifyListeners();
   }
 }

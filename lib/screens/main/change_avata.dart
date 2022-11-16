@@ -8,22 +8,17 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ltp/models/postmodel.dart';
 import 'package:ltp/utils/constants.dart';
-import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import '../../providers/custom_posts.dart';
-
 // ignore: must_be_immutable
-class PostScreen extends StatefulWidget {
-  const PostScreen({Key? key}) : super(key: key);
+class ChangeAvata extends StatefulWidget {
+  const ChangeAvata({Key? key}) : super(key: key);
 
   @override
-  State<PostScreen> createState() => _PostScreenState();
+  State<ChangeAvata> createState() => _PostScreenState();
 }
 
-class _PostScreenState extends State<PostScreen> {
-  late PostsProvider postsProvider;
-
+class _PostScreenState extends State<ChangeAvata> {
   ImagePicker picker = ImagePicker();
 
   final userLogin = GetStorage().read("userLogin");
@@ -31,16 +26,6 @@ class _PostScreenState extends State<PostScreen> {
 
   File? imageFile;
   var formController = TextEditingController();
-
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_){
-      postsProvider = Provider.of<PostsProvider>(context, listen: false);
-    });
-  }
 
   Future chooseImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -72,25 +57,43 @@ class _PostScreenState extends State<PostScreen> {
   //     Get.back(result: myPostModel);
   //   }
   // }
-  
+
   void uploadPost() async{
+    // print(userLogin['userId']);
     dio.FormData formData ;
     if (imageFile != null) {
+      // print('imagefile khong null');
       String? fileName = imageFile?.path.split('/').last;
 
       final file = await dio.MultipartFile.fromFile(imageFile!.path, filename: fileName);
-       formData = dio.FormData.fromMap({
+
+      // print(file);
+      // print('filepath: ${imageFile!.path}');
+
+      formData = dio.FormData.fromMap({
         "UserId": userLogin['userId'],
         "Text": formController.text,
         "PhotoFile": file,
       });
     }else {
+      // print('imagefile null');
+
       formData = dio.FormData.fromMap({
         "UserId": userLogin['userId'],
         "Text": formController.text,
       });
     }
-    await postsProvider.creatPost(formData);
+    // print('file upload');
+    // print(imageFile);
+
+    final res = await dio.Dio().post("https://10.0.2.2:7284/api/Post/CreatePost",
+      data: formData,
+      //   onSendProgress: (send, total) {
+      // // print("send: $send, total: $total");
+      //   }
+    );
+
+    print(res);
 
     Get.back();
   }
@@ -101,7 +104,7 @@ class _PostScreenState extends State<PostScreen> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         centerTitle: true,
-        title: 'Post Screen'.text.make(),
+        title: 'Change Screen'.text.make(),
       ),
       body: SizedBox(
         child: Form(
@@ -109,12 +112,9 @@ class _PostScreenState extends State<PostScreen> {
             children: [
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: 'Write Something about your post',
-                  ),
-                  controller: formController,
+                const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                child: Container(
+
                 ),
               ),
               InkWell(
@@ -123,27 +123,27 @@ class _PostScreenState extends State<PostScreen> {
                 },
                 child: imageFile == null
                     ? Container(
-                        margin: const EdgeInsets.only(top: 200),
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              const Icon(
-                                Icons.upload_outlined,
-                                size: 50,
-                                color: kMainColor,
-                              ),
-                              'Select Image'.text.make(),
-                            ]),
-                      )
-                    : Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Image.file(
-                            imageFile!,
-                            width: Get.width * 0.5,
-                          ),
+                  margin: const EdgeInsets.only(top: 200),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Icon(
+                          Icons.upload_outlined,
+                          size: 50,
+                          color: kMainColor,
                         ),
-                      ),
+                        'Select Image'.text.make(),
+                      ]),
+                )
+                    : Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Image.file(
+                      imageFile!,
+                      width: Get.width * 0.5,
+                    ),
+                  ),
+                ),
               ),
               const Spacer(),
               Container(
