@@ -40,6 +40,9 @@ class SignInPage extends StatelessWidget {
 
           final jsonMap = json.decode(res.toString());
 
+          print("res");
+          print(jsonMap);
+
           commonProvider.setUser(User.fromJson(jsonMap['data']));
 
           // GetStorage().write('userLogin', jsonMap['data']);

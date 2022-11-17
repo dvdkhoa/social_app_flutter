@@ -70,8 +70,13 @@ class _ProfilePageState extends State<myProfilePage> {
 
     final commonProvider = Provider.of<CommonProvider>(context, listen: true);
     User user = commonProvider.getUser;
+    
+
+    print('hi alo hehehe');
+    print(user.followers);
 
     var postmodel = PostModel();
+    print(user.profile!.background.toString());
 
     void _onButtonPressed(bool isChoose, int change) {
       showModalBottomSheet(context: context, builder: (context){
@@ -105,7 +110,7 @@ class _ProfilePageState extends State<myProfilePage> {
                     content: Stack(
                       alignment: Alignment.center,
                       children: [
-                        Image.network(postmodel.user.bannerImage,
+                        Image.network(user.profile!.background.toString(),
                             fit: BoxFit.cover,
                             height: 200)
                       ],
@@ -158,7 +163,9 @@ class _ProfilePageState extends State<myProfilePage> {
                           color: Colors.white12,
                           image: DecorationImage(
                             image: NetworkImage(
-                              postmodel.user.bannerImage,
+                              user.profile!.background == null ?
+                              postmodel.user.bannerImage :
+                              user.profile!.background.toString(),
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -183,7 +190,7 @@ class _ProfilePageState extends State<myProfilePage> {
 
                           child: CircleAvatar(
                             backgroundImage:
-                            NetworkImage(userLogin['profile']['image']),
+                            NetworkImage(user.profile!.image.toString()),
                             radius: Get.height * 0.1,
                           ),
                         ),
@@ -199,7 +206,7 @@ class _ProfilePageState extends State<myProfilePage> {
                               .minFontSize(Get.textScaleFactor * 22)
                               .letterSpacing(2)
                               .makeCentered(),
-                          postmodel.user.bio.text
+                          'User'.text
                               .fontWeight(FontWeight.w500)
                               .minFontSize(Get.textScaleFactor * 16)
                               .color(Colors.blue)
@@ -230,14 +237,14 @@ class _ProfilePageState extends State<myProfilePage> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      postmodel.user.followings.text
+                                      postmodel.user.followers.text
                                           .fontWeight(FontWeight.w600)
                                           .minFontSize(Get.textScaleFactor * 18)
                                           .make(),
                                       SizedBox(
                                         width: Get.width * 0.02,
                                       ),
-                                      'Followings'
+                                      'Follower'
                                           .text
                                           .minFontSize(Get.textScaleFactor)
                                           .make(),
