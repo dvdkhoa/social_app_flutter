@@ -75,8 +75,12 @@ class _ProfilePageState extends State<myProfilePage> {
     print('hi alo hehehe');
     print(user.followers);
 
+
     var postmodel = PostModel();
     print(user.profile!.background.toString());
+
+    print('alkjhfjdfhd');
+    print(postmodel.user.followers.text);
 
     void _onButtonPressed(bool isChoose, int change) {
       showModalBottomSheet(context: context, builder: (context){
