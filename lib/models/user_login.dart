@@ -2,6 +2,7 @@ class User {
   String? userId;
   Meta? meta;
   Profile? profile;
+  dynamic followers;
 
   User({this.userId, this.meta, this.profile});
 
@@ -10,6 +11,7 @@ class User {
     meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
     profile =
     json['profile'] != null ? new Profile.fromJson(json['profile']) : null;
+    followers = json['followers'];
   }
 
   Map<String, dynamic> toJson() {
@@ -20,6 +22,9 @@ class User {
     }
     if (this.profile != null) {
       data['profile'] = this.profile!.toJson();
+    }
+    if (this.followers != null){
+      data['followers'] = this.followers;
     }
     return data;
   }
@@ -53,6 +58,7 @@ class Profile {
   String? background;
   String? gender;
 
+
   Profile({this.name, this.image, this.background, this.gender});
 
   Profile.fromJson(Map<String, dynamic> json) {
@@ -60,6 +66,7 @@ class Profile {
     image = json['image'];
     background = json['background'];
     gender = json['gender'];
+
   }
 
   Map<String, dynamic> toJson() {
@@ -68,6 +75,7 @@ class Profile {
     data['image'] = this.image;
     data['background'] = this.background;
     data['gender'] = this.gender;
+
     return data;
   }
 }

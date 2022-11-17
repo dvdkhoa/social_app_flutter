@@ -25,6 +25,7 @@ class ChangeAvata extends StatefulWidget {
 class _PostScreenState extends State<ChangeAvata> {
   int change = Get.arguments;
 
+
   late CommonProvider common_provider;
 
 
@@ -72,7 +73,7 @@ class _PostScreenState extends State<ChangeAvata> {
     }
     if(formData != null){
       context.loaderOverlay.show();
-      final res = await dio.Dio().put("https://10.0.2.2:7284/api/Account/ChangeAvatar?userId="+userLogin['userId'],
+      final res = await dio.Dio().put("https://10.0.2.2:7284/api/Account/${ change == 0 ? "ChangeAvatar" : "ChangeBackground"  }?userId="+userLogin['userId'],
         data: formData,
       );
       print(res.data);
@@ -80,7 +81,11 @@ class _PostScreenState extends State<ChangeAvata> {
 
       User user = User.fromJson(userLogin);
 
-      user.profile!.image = res.data['data'];
+      if(change == 0){
+        user.profile!.image = res.data['data'];
+      }else{
+        user.profile!.background = res.data['data'];
+      }
 
       common_provider.setUser(user);
     }

@@ -155,7 +155,6 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
       print(postFiles![0].url.toString());
     }
 
-
     Widget buildSettingButton() {
       if(userLogin['userId'] == widget.post.by!.id) {
         return GestureDetector(
