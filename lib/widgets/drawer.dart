@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/postmodel.dart';
+import 'package:ltp/providers/common_provider.dart';
+import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/providers/navbar.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +18,7 @@ class CustomDrawer extends StatelessWidget {
     final userLogin = GetStorage().read('userLogin');
 
     final navBarProvider = Provider.of<NavBarProvider>(context, listen: false);
+    final postProvider = Provider.of<PostsProvider>(context, listen: false);
 
     navBarProvider.setFollow(userLogin['userId']);
 
@@ -223,8 +226,9 @@ class CustomDrawer extends StatelessWidget {
                       ),
                     ),
                     InkWell(
-                      onTap: () {
-                        GetStorage().remove('userLogin');
+                      onTap: () async{
+                        await GetStorage().remove('userLogin');
+                        postProvider.clearMemory();
                         Get.offAllNamed('/signinpage');
                       },
                       child: Padding(

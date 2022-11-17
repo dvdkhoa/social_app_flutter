@@ -5,7 +5,7 @@ import 'package:ltp/screens/main/home.dart';
 import 'package:ltp/screens/utility/comments.dart';
 
 import 'package:ltp/screens/utility/msgs.dart';
-import 'package:ltp/screens/main/post.dart';
+import 'package:ltp/screens/main/post_temp.dart';
 import 'package:ltp/screens/main/wrapper.dart';
 import 'package:ltp/screens/splash.dart';
 
@@ -17,7 +17,7 @@ import '../screens/main/inbox.dart';
 import '../screens/main/myprofile.dart';
 import '../screens/main/notifications.dart';
 import '../screens/main/post_edit.dart';
-import '../screens/main/postvideo.dart';
+import '../screens/main/post.dart';
 import '../screens/main/profile.dart';
 import '../screens/main/search.dart';
 import '../widgets/custom_comments.dart';
@@ -46,7 +46,8 @@ class RoutingPages {
     ),
     GetPage(
       name: '/postpage',
-      page: () => const PostScreen(),
+      // page: () => const PostScreen(),
+        page: () => const PostScreen()
     ),
     GetPage(
       name: '/editpostpage',

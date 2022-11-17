@@ -40,17 +40,18 @@ class SignInPage extends StatelessWidget {
 
           final jsonMap = json.decode(res.toString());
 
-          print("res");
-          print(jsonMap);
-
-          commonProvider.setUser(User.fromJson(jsonMap['data']));
+          final user = User.fromJson(jsonMap['data']);
+          print("user: ");
+          print(user.profile!.name);
+          print(user.userId);
+          commonProvider.setUser(user)
 
           // GetStorage().write('userLogin', jsonMap['data']);
         }
 
         // print(GetStorage().read('userLogin'));
-        Get.to(WrapperManager());
-        // Get.toNamed('/wrapper');
+        // Get.to(WrapperManager());
+        Get.toNamed('/wrapper');
       } on DioError catch(e){
         const snackBar = SnackBar(
           content: Text('Đăng nhập thất bại! :'),

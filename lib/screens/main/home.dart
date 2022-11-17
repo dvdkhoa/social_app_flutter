@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/post.dart';
+import 'package:ltp/models/user_login.dart';
 import 'package:ltp/providers/custom_posts.dart';
 
 import 'package:ltp/widgets/custom_post-widget.dart';
@@ -39,7 +40,8 @@ class _HomePageState extends State<HomePage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_){
       final postProvider = Provider.of<PostsProvider>(context, listen: false);
-      postProvider.getNewsFromServer();
+      final user = User.fromJson(GetStorage().read('userLogin'));
+      postProvider.getNewsFromServer(user.userId.toString());
     });
 
 

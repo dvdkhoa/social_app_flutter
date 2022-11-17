@@ -104,7 +104,7 @@ class _CustomCommentsPageState extends State<CustomCommentsPage> {
             CustomTextInputWidget(
               msgController: texteditingcontroller,
               performFunc: () {
-                postProvider.addCommentToPost(texteditingcontroller.text, postId);
+                postProvider.addCommentToPost(texteditingcontroller.text, postId, userLogin['userId']);
                 texteditingcontroller.text = "";
               },
             ),

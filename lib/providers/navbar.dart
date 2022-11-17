@@ -9,17 +9,13 @@ class NavBarProvider with ChangeNotifier {
   List _users = [];
   
   int _follower = 0;
-  
-  
+
   int getFollow(){
     return _follower;
   }
 
   void setFollow(userId) async{
     final res = await Dio().get('https://10.0.2.2:7284/api/Account/GetUser?userId='+userId);
-
-    print('123abc');
-    // print(res);
 
     final map = Map<String, dynamic>.from(res.data);
 
