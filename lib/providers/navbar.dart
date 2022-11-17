@@ -85,6 +85,8 @@ class NavBarProvider with ChangeNotifier {
           height: Get.height * 0.05,
           child:  Center(
             child: TextField(
+
+              textAlignVertical: TextAlignVertical.bottom,
               onChanged: (value) {
                 if(!value.isEmptyOrNull)
                 {
@@ -99,13 +101,17 @@ class NavBarProvider with ChangeNotifier {
                 }
               },
               style: TextStyle(
+
                 color: Colors.white,
               ),
               cursorColor: Colors.white,
               decoration: InputDecoration(
+
                   hintText: 'Search for Anything',
                   hintStyle: TextStyle(
+
                     color: Color.fromARGB(255, 231, 228, 228),
+
                   ),
                   border: InputBorder.none),
             ),

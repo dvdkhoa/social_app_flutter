@@ -5,11 +5,14 @@ import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ltp/providers/common_provider.dart';
 import 'package:ltp/screens/main/wrapper.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:ltp/widgets/checkbox.dart';
 import 'package:ltp/widgets/custom_input.dart';
+import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../../models/user_login.dart';
 
 class SignInPage extends StatelessWidget {
   SignInPage({Key? key}) : super(key: key);
@@ -17,8 +20,46 @@ class SignInPage extends StatelessWidget {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+
+
   @override
   Widget build(BuildContext context) {
+
+    final commonProvider = Provider.of<CommonProvider>(context, listen: false);
+
+
+    void _handleLogin(context) async{
+      try{
+        Dio dio = Dio();
+        final res = await dio.post('https://10.0.2.2:7284/api/Account/Login',
+            data: {
+              "userName": _emailController.text,
+              "password": _passwordController.text
+            });
+        if(res.statusCode == 200) {
+
+          final jsonMap = json.decode(res.toString());
+
+          print("res");
+          print(jsonMap);
+
+          commonProvider.setUser(User.fromJson(jsonMap['data']));
+
+          // GetStorage().write('userLogin', jsonMap['data']);
+        }
+
+        // print(GetStorage().read('userLogin'));
+        Get.to(WrapperManager());
+        // Get.toNamed('/wrapper');
+      } on DioError catch(e){
+        const snackBar = SnackBar(
+          content: Text('Đăng nhập thất bại! :'),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -182,30 +223,5 @@ class SignInPage extends StatelessWidget {
       ),
     );
   }
-  void _handleLogin(context) async{
-    try{
-      Dio dio = Dio();
-      final res = await dio.post('https://10.0.2.2:7284/api/Account/Login',
-          data: {
-            "userName": _emailController.text,
-            "password": _passwordController.text
-          });
-      if(res.statusCode == 200) {
 
-        final jsonMap = json.decode(res.toString());
-
-        GetStorage().write('userLogin', jsonMap['data']);
-      }
-
-      // print(GetStorage().read('userLogin'));
-      Get.to(WrapperManager());
-      // Get.toNamed('/wrapper');
-    } on DioError catch(e){
-      const snackBar = SnackBar(
-        content: Text('Đăng nhập thất bại! :'),
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-  }
 }

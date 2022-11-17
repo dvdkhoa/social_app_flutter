@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:ltp/providers/common_provider.dart';
 import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/providers/navbar.dart';
 import 'package:ltp/providers/post_temp.dart';
@@ -37,6 +38,9 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProvider(
               create: (context) => PostProvider()
+          ),
+          ChangeNotifierProvider(
+              create: (context) => CommonProvider()
           )
         ],
         child: GetMaterialApp(
