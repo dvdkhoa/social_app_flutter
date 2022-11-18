@@ -44,7 +44,7 @@ class SignInPage extends StatelessWidget {
           print("user: ");
           print(user.profile!.name);
           print(user.userId);
-          commonProvider.setUser(user)
+          commonProvider.setUser(user);
 
           // GetStorage().write('userLogin', jsonMap['data']);
         }
