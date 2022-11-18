@@ -22,7 +22,7 @@ class _SplashPageState extends State<SplashPage> {
         color: kMainColor,
       ),
       title: const Text(
-        "Random",
+        "Rade",
         style: TextStyle(
           fontSize: 25,
           color: kMainColor,
