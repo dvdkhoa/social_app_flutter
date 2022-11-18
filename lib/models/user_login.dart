@@ -2,16 +2,16 @@ class User {
   String? userId;
   Meta? meta;
   Profile? profile;
-  dynamic followers;
+  Map<String, dynamic>? followers;
 
-  User({this.userId, this.meta, this.profile});
+  User({this.userId, this.meta, this.profile, this.followers});
 
   User.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
     meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
     profile =
     json['profile'] != null ? new Profile.fromJson(json['profile']) : null;
-    followers = json['followers'];
+    followers = Map<String, dynamic>.from(json['followers']);
   }
 
   Map<String, dynamic> toJson() {

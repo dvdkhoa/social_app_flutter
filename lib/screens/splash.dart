@@ -22,7 +22,7 @@ class _SplashPageState extends State<SplashPage> {
         color: kMainColor,
       ),
       title: const Text(
-        "Random",
+        "Rade",
         style: TextStyle(
           fontSize: 25,
           color: kMainColor,
@@ -37,7 +37,7 @@ class _SplashPageState extends State<SplashPage> {
         style: TextStyle(color: kMainColor),
       ),
       navigator: GetStorage().read('userLogin') != null ? WrapperManager() : SignInPage(),
-      durationInSeconds: 3,
+      durationInSeconds: 5,
     );
   }
 }

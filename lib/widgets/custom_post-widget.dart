@@ -267,7 +267,11 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
               ? Container()
               :  (postFiles![0].fileType == 0
                 ? InkWell(
-                    child: Image.network(postFiles![0].url.toString()),
+                        child: Image.network(postFiles![0].url.toString(),
+                          // alignment: Alignment.center,
+                          width: Get.width,
+                          fit: BoxFit.cover,
+                        ),
                     // : AssetPlayerWidget(url: "https://10.0.2.2:7284/" + postFiles![0].url.toString()),
                       onTap: () {
                         showDialog(context: context, builder: (context) => AlertDialog(

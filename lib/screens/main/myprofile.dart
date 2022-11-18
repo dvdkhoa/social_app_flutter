@@ -74,7 +74,9 @@ class _ProfilePageState extends State<myProfilePage> {
     
 
     print('hi alo hehehe');
-    print(user.followers);
+
+    print(user.followers!.length.toString());
+
 
     var postmodel = PostModel();
     print(user.profile!.background.toString());
@@ -238,7 +240,8 @@ class _ProfilePageState extends State<myProfilePage> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      postmodel.user.followers.text
+                                      // postmodel.user.followers.text
+                                      user.followers!.length.text
                                           .fontWeight(FontWeight.w600)
                                           .minFontSize(Get.textScaleFactor * 18)
                                           .make(),
