@@ -193,13 +193,23 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 5.0, top: 5),
-                  child: CircleAvatar(
-                    radius: 30,
-                    backgroundColor: kaccentColor,
+                  child: InkWell(
+                    onTap: () {
+                      if(userLogin['userId'] == widget.post.by!.id){
+                        Get.toNamed("/myprofilepage");
+                      }
+                      else {
+                        Get.toNamed("/profilepage", arguments: widget.post.by!.id);
+                      }
+                    },
                     child: CircleAvatar(
-                      backgroundImage:
-                      NetworkImage(widget.post.by!.image ?? ""),
-                      radius: 28,
+                      radius: 30,
+                      backgroundColor: kaccentColor,
+                      child: CircleAvatar(
+                        backgroundImage:
+                        NetworkImage(widget.post.by!.image ?? ""),
+                        radius: 28,
+                      ),
                     ),
                   ),
                 ),
