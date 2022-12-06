@@ -118,7 +118,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               .minFontSize(Get.textScaleFactor * 22)
                               .letterSpacing(2)
                               .makeCentered(),
-                          postmodel.user.bio.text
+                          // postmodel.user.bio.text
+                              'User'.text
                               .fontWeight(FontWeight.w500)
                               .minFontSize(Get.textScaleFactor * 16)
                               .color(Colors.blue)

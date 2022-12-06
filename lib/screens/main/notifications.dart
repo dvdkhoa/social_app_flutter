@@ -10,10 +10,10 @@ class NotificationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final notification = NotificationModel(
-      title: 'Đặng Trung Tín',
-      time: '01/01/19xx',
+      title: 'Abcxyz',
+      time: '20/01/2022',
       profileImage:
-      'https://www.reviewjournal.com/wp-content/uploads/2019/08/12603740_web1_12603740-5a17a465803a4e0d899189cbce4251b5.jpg',
+      'https://png.pngtree.com/png-vector/20201208/ourlarge/pngtree-a-bell-with-shadow-png-image_2532776.jpg',
       bannerImage:
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSb4eWdIockxFe4lcwv4f-IQ5PeiDHE3lKR7A&usqp=CAU',
     );

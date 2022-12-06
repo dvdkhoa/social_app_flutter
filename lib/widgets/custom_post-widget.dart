@@ -172,6 +172,338 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
       return Container();
     }
 
+    if(widget.post!.share!.originPostId != null){
+      return Container(
+        decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: kaccentColor.withOpacity(0.25),
+                blurRadius: 20,
+                spreadRadius: 1,
+              ),
+            ],
+            //border: Border.all(color: kaccentColor.withOpacity(0.2), width: 2),
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white),
+        margin: const EdgeInsets.only(left: 15, right: 15, top: 10),
+        child: Column(
+          children: [
+            SizedBox(
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5.0, top: 5),
+                    child: InkWell(
+                      onTap: () {
+                        if(userLogin['userId'] == widget.post.by!.id){
+                          Get.toNamed("/myprofilepage");
+                        }
+                        else {
+                          Get.toNamed("/profilepage", arguments: widget.post.by!.id);
+                        }
+                      },
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundColor: kaccentColor,
+                        child: CircleAvatar(
+                          backgroundImage:
+                          NetworkImage(widget.post.by!.image ?? ""),
+                          radius: 28,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0, top: 5),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          VxTextBuilder(widget.post.by?.name ?? "")
+                              .minFontSize(17)
+                              .color(kMainColor)
+                              .maxFontSize(18)
+                              .fontWeight(FontWeight.w700)
+                              .make(),
+                          // datamodel.user.bio.text
+                          //     .minFontSize(12)
+                          //     .maxFontSize(13)
+                          //     .color(Colors.blue)
+                          //     .make(),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.access_time,
+                                color: kMainColor,
+                                size: 18,
+                              ),
+                              const SizedBox(
+                                width: 2,
+                              ),
+                              widget.post.meta!.created
+                                  .toString()
+                                  .text
+                                  .letterSpacing(1)
+                                  .minFontSize(10)
+                                  .maxFontSize(12)
+                                  .color(Colors.black)
+                                  .make(),
+                            ],
+                          ),
+                        ]),
+                  ),
+                  SizedBox(width: 30,),
+                  buildSettingButton()
+                ],
+              ),
+            ),
+            Container(
+            decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: kaccentColor.withOpacity(0.25),
+                    blurRadius: 20,
+                    spreadRadius: 1,
+                  ),
+                ],
+                //border: Border.all(color: kaccentColor.withOpacity(0.2), width: 2),
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white),
+            margin: const EdgeInsets.only(left: 15, right: 15, top: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5.0, top: 5),
+                        child: InkWell(
+                          onTap: () {
+                            if(userLogin['userId'] == widget.post.by!.id){
+                              Get.toNamed("/myprofilepage");
+                            }
+                            else {
+                              Get.toNamed("/profilepage", arguments: widget.post.by!.id);
+                            }
+                          },
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundColor: kaccentColor,
+                            child: CircleAvatar(
+                              backgroundImage:
+                              NetworkImage(widget.post.by!.image ?? ""),
+                              radius: 28,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10.0, top: 5),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              VxTextBuilder(widget.post.by?.name ?? "")
+                                  .minFontSize(17)
+                                  .color(kMainColor)
+                                  .maxFontSize(18)
+                                  .fontWeight(FontWeight.w700)
+                                  .make(),
+                              // datamodel.user.bio.text
+                              //     .minFontSize(12)
+                              //     .maxFontSize(13)
+                              //     .color(Colors.blue)
+                              //     .make(),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.access_time,
+                                    color: kMainColor,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(
+                                    width: 2,
+                                  ),
+                                  widget.post.meta!.created
+                                      .toString()
+                                      .text
+                                      .letterSpacing(1)
+                                      .minFontSize(10)
+                                      .maxFontSize(12)
+                                      .color(Colors.black)
+                                      .make(),
+                                ],
+                              ),
+                            ]),
+                      ),
+                      SizedBox(width: 30,),
+                      buildSettingButton()
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  child: Divider(
+                    color: Colors.black38,
+                  ),
+                  height: 10,
+                ),
+                widget.post.detail!.text.toString().isEmptyOrNull
+                    ? Container()
+                    : Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                  child: VxTextBuilder(widget.post.detail!.text.toString()).make(),
+                ),
+                postFiles?.length == 0
+                    ? Container()
+                    :  (postFiles![0].fileType == 0
+                    ? InkWell(
+                  child: Image.network(postFiles![0].url.toString(),
+                    // alignment: Alignment.center,
+                    width: Get.width,
+                    fit: BoxFit.cover,
+                  ),
+                  // : AssetPlayerWidget(url: "https://10.0.2.2:7284/" + postFiles![0].url.toString()),
+                  onTap: () {
+                    showDialog(context: context, builder: (context) => AlertDialog(
+                      content: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.network(postFiles![0].url.toString(),
+                            fit: BoxFit.cover,
+                            height: 200,)
+                        ],
+                      ),
+                    ));
+                  },
+                )
+                    : InkWell(
+                  // child: AssetPlayerWidget(url: 'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'),
+                  child: AssetPlayerWidget(url: postFiles![0].url.toString(),),
+                  onLongPress: () {
+                    showDialog(context: context, builder: (context) => AlertDialog(
+                      content: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          AssetPlayerWidget(url: postFiles![0].url.toString())
+                        ],
+                      ),
+                    ));
+                  },
+                )
+                ) ,
+                const SizedBox(
+                  child: Divider(
+                    color: Colors.black38,
+                  ),
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SpecialIcon(
+                      val: likeCount.toString(),
+                      iconData: isLike ? Icons.heart_broken : Icons.favorite_border_outlined,
+                      // ? Icons.favorite_border_outlined
+                      //     : Icons.favorite,
+                      color: likes.isEmpty ? kMainColor : kMainColor,
+                      doFunction: () async {
+                        // valueprovider.addLiketoPost(index, datamodel.user.name);
+                        Dio dio = Dio();
+                        final res = await dio.post("https://10.0.2.2:7284/api/Post/Like",
+                            data: {
+                              "userId": GetStorage().read('userLogin')['userId'],
+                              "postId": widget.post.id
+                            });
+                        print('hello');
+
+                        final map = Map<String,dynamic>.from(res.data);
+                        print(map);
+                        setState(() {
+                          likeCount = map['data']['likeCount'] as int;
+
+                          if(isLike)
+                            likes.removeWhere((element) => element.by!.id == userLogin['userId']);
+                          else
+                            likes.add(Likes(by: By(id: userLogin['userId'])));
+
+                          print('ngan');
+                          print(likes);
+                          print(likeCount);
+                        });
+                      },
+                    ),
+                    SpecialIcon(
+                      val: comments.length.toString(),
+                      iconData: Icons.comment_outlined,
+                      color: kMainColor,
+                      doFunction: () {
+                        Get.toNamed('/commentspage', arguments: widget.post.id);
+                      },
+                    ),
+                    SpecialIcon(
+                      val: '',
+                      iconData: Icons.repeat,
+                      color: kmainColor,
+                      doFunction: () {},
+                    ),
+                    SpecialIcon(
+                      val: '',
+                      iconData: Icons.share,
+                      color: kMainColor,
+                      doFunction: () {},
+                    )
+                  ],
+                )
+                // Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                //   SpecialIcon(
+                //     val: datamodel.comments.length.toString(),
+                //     iconData: Icons.comment_outlined,
+                //     color: kMainColor,
+                //     doFunction: () {
+                //       Get.toNamed('/commentspage', arguments: index);
+                //     },
+                //   ),
+                //   // SpecialIcon(
+                //   //   val: datamodel.retweets.length.toString(),
+                //   //   iconData: Icons.repeat,
+                //   //   color: kmainColor,
+                //   //   doFunction: () {},
+                //   // ),
+                //   Consumer<PostsProvider>(
+                //     builder: (context, valueprovider, child) => SpecialIcon(
+                //       val: datamodel.likes.length.toString(),
+                //       iconData: datamodel.likes.isEmpty
+                //           ? Icons.favorite_border_outlined
+                //           : Icons.favorite,
+                //       color: datamodel.likes.isEmpty ? kMainColor : kMainColor,
+                //       doFunction: () {
+                //         valueprovider.addLiketoPost(index, datamodel.user.name);
+                // //       },
+                //     ),
+                //   ),
+                //   SpecialIcon(
+                //     val: '',
+                //     iconData: Icons.share,
+                //     color: kMainColor,
+                //     doFunction: () {},
+                //   )
+                // ]),
+              ],
+            ),
+          ),
+    ]
+        ),
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(
           boxShadow: [

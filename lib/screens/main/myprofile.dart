@@ -39,6 +39,7 @@ class _ProfilePageState extends State<myProfilePage> {
 
     final map = Map<String, dynamic>.from(res.data);
 
+    // if()
     var list = map['data'] as List;
 
     return list;
@@ -71,9 +72,7 @@ class _ProfilePageState extends State<myProfilePage> {
 
     final commonProvider = Provider.of<CommonProvider>(context, listen: true);
     User user = commonProvider.getUser;
-    
 
-    print('hi alo hehehe');
 
     print(user.followers!.length.toString());
 
@@ -101,7 +100,6 @@ class _ProfilePageState extends State<myProfilePage> {
                     content: Stack(
                       alignment: Alignment.center,
                       children: [
-
                         Image.network(user.profile!.image.toString(),
                             fit: BoxFit.cover,
                             height: 200)
@@ -113,7 +111,9 @@ class _ProfilePageState extends State<myProfilePage> {
                     content: Stack(
                       alignment: Alignment.center,
                       children: [
-                        Image.network(user.profile!.background.toString(),
+                        Image.network(user.profile!.background != null
+                        ? user.profile!.background.toString()
+                            : postmodel.user.bannerImage,
                             fit: BoxFit.cover,
                             height: 200)
                       ],
