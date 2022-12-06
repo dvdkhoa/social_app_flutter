@@ -133,4 +133,10 @@ class PostsProvider extends ChangeNotifier {
     _myWall.remove(post);
     notifyListeners();
   }
+
+
+  Future<void> sharePost(String postId, String userId) async{
+    Dio dio = Dio();
+    final res = await Dio().post('https://10.0.2.2:7284/api/Post/Share?userId=${userId}&postId=${postId}');
+  }
 }

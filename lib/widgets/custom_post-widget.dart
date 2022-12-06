@@ -126,13 +126,9 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
     }
   }
 
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
+
     print('build');
     final userLogin = GetStorage().read('userLogin');
     bool isLike = false;
@@ -141,6 +137,43 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
         isLike = true;
       }
     });
+
+    Future<void> _showShareDialog() async {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Confirm'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: const <Widget>[
+                  Text('Do you want to share this post ?'),
+                  // Text('Would you like to approve of this message?'),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Yes'),
+                onPressed: () async {
+                  await _postsProvider.sharePost(widget.post!.id.toString(), userLogin['userId']);
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+
 
     List<PostFiles>? postFiles = widget.post.detail?.postFiles;
 
@@ -190,6 +223,8 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
           children: [
             SizedBox(
               child: Row(
+                // crossAxisAlignment: CrossAxisAlignment.end,
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 5.0, top: 5),
@@ -213,50 +248,37 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0, top: 5),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          VxTextBuilder(widget.post.by?.name ?? "")
-                              .minFontSize(17)
-                              .color(kMainColor)
-                              .maxFontSize(18)
-                              .fontWeight(FontWeight.w700)
-                              .make(),
-                          // datamodel.user.bio.text
-                          //     .minFontSize(12)
-                          //     .maxFontSize(13)
-                          //     .color(Colors.blue)
-                          //     .make(),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.access_time,
-                                color: kMainColor,
-                                size: 18,
-                              ),
-                              const SizedBox(
-                                width: 2,
-                              ),
-                              widget.post.meta!.created
-                                  .toString()
-                                  .text
-                                  .letterSpacing(1)
-                                  .minFontSize(10)
-                                  .maxFontSize(12)
-                                  .color(Colors.black)
-                                  .make(),
-                            ],
-                          ),
-                        ]),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0, top: 5),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                VxTextBuilder(widget.post.by?.name ?? "")
+                                    .minFontSize(17)
+                                    .color(kMainColor)
+                                    .maxFontSize(18)
+                                    .fontWeight(FontWeight.w700)
+                                    .make(),
+                                // datamodel.user.bio.text
+                                //     .minFontSize(12)
+                                //     .maxFontSize(13)
+                                //     .color(Colors.blue)
+                                //     .make(),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                              ]),
+                        ),
+                        buildSettingButton()
+                      ],
+                    ),
                   ),
                   SizedBox(width: 30,),
-                  buildSettingButton()
                 ],
               ),
             ),
@@ -295,7 +317,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                             backgroundColor: kaccentColor,
                             child: CircleAvatar(
                               backgroundImage:
-                              NetworkImage(widget.post.by!.image ?? ""),
+                              NetworkImage(widget.post.share!.originOwner?.image.toString() ?? ""),
                               radius: 28,
                             ),
                           ),
@@ -307,7 +329,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              VxTextBuilder(widget.post.by?.name ?? "")
+                              VxTextBuilder(widget.post.share!.originOwner?.name.toString() ?? "")
                                   .minFontSize(17)
                                   .color(kMainColor)
                                   .maxFontSize(18)
@@ -344,7 +366,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                             ]),
                       ),
                       SizedBox(width: 30,),
-                      buildSettingButton()
+                      //buildSettingButton()
                     ],
                   ),
                 ),
@@ -458,7 +480,9 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                       val: '',
                       iconData: Icons.share,
                       color: kMainColor,
-                      doFunction: () {},
+                      doFunction: () {
+                        _showShareDialog();
+                      },
                     )
                   ],
                 )
@@ -702,7 +726,9 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                   val: '',
                   iconData: Icons.share,
                   color: kMainColor,
-                  doFunction: () {},
+                  doFunction: () {
+                    _showShareDialog();
+                  },
                 )
             ],
           )
