@@ -3,6 +3,7 @@ class User {
   Meta? meta;
   Profile? profile;
   Map<String, dynamic>? followers;
+  List<String>? followings;
 
   User({this.userId, this.meta, this.profile, this.followers});
 
@@ -53,6 +54,7 @@ class Meta {
 }
 
 class Profile {
+  String? id;
   String? name;
   String? image;
   String? background;
@@ -66,7 +68,7 @@ class Profile {
     image = json['image'];
     background = json['background'];
     gender = json['gender'];
-
+    id = json['id'];
   }
 
   Map<String, dynamic> toJson() {
@@ -75,7 +77,7 @@ class Profile {
     data['image'] = this.image;
     data['background'] = this.background;
     data['gender'] = this.gender;
-
+    data['id'] = this.id;
     return data;
   }
 }

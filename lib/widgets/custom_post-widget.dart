@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:ltp/models/post.dart';
 import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/providers/post_temp.dart';
@@ -129,7 +130,6 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
   @override
   Widget build(BuildContext context) {
 
-    print('build');
     final userLogin = GetStorage().read('userLogin');
     bool isLike = false;
     widget.post.likes?.forEach((element) {
@@ -173,6 +173,10 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
       );
     }
 
+    var timeCreated = DateTime.parse(widget.post.meta!.created.toString());
+    var formatter = new DateFormat('yyyy-MMM-dd');
+    String timeCreated_formatted = formatter.format(timeCreated);
+
 
 
     List<PostFiles>? postFiles = widget.post.detail?.postFiles;
@@ -207,6 +211,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
 
     if(widget.post!.share!.originPostId != null){
       return Container(
+        padding: EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
@@ -223,8 +228,6 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
           children: [
             SizedBox(
               child: Row(
-                // crossAxisAlignment: CrossAxisAlignment.end,
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 5.0, top: 5),
@@ -258,20 +261,36 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                VxTextBuilder(widget.post.by?.name ?? "")
-                                    .minFontSize(17)
-                                    .color(kMainColor)
-                                    .maxFontSize(18)
-                                    .fontWeight(FontWeight.w700)
-                                    .make(),
+                                RichText(
+                                  text: TextSpan(
+                                    text: widget.post.by?.name,
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      color: kMainColor,
+                                      fontWeight: FontWeight.w700
+                                    ),
+                                    children: const <TextSpan>[
+                                      TextSpan(
+                                        text: ' đã chia sẻ',
+                                        style: TextStyle(fontWeight: FontWeight.w400, color: Colors.black87),
+                                      ),
+                                    ],
+                                  ),
+                                )
                                 // datamodel.user.bio.text
                                 //     .minFontSize(12)
                                 //     .maxFontSize(13)
                                 //     .color(Colors.blue)
                                 //     .make(),
-                                const SizedBox(
-                                  height: 5,
-                                ),
+                                // const SizedBox(
+                                //   height: 5,
+                                // ),
+                                // VxTextBuilder("đã chia sẻ")
+                                //     .minFontSize(17)
+                                //     .maxFontSize(18)
+                                //     .fontWeight(FontWeight.w500)
+                                //     .color(kmaintxtColor)
+                                //     .make()
                               ]),
                         ),
                         buildSettingButton()
@@ -353,7 +372,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                                   const SizedBox(
                                     width: 2,
                                   ),
-                                  widget.post.meta!.created
+                                  timeCreated_formatted
                                       .toString()
                                       .text
                                       .letterSpacing(1)
@@ -599,7 +618,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                             const SizedBox(
                               width: 2,
                             ),
-                            widget.post.meta!.created
+                            timeCreated_formatted
                                 .toString()
                                 .text
                                 .letterSpacing(1)

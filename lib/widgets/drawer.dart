@@ -1,7 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/postmodel.dart';
+import 'package:ltp/models/user_login.dart';
 import 'package:ltp/providers/common_provider.dart';
 import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/providers/navbar.dart';
@@ -23,6 +25,7 @@ class CustomDrawer extends StatelessWidget {
     navBarProvider.setFollow(userLogin['userId']);
 
     final followers = navBarProvider.getFollow();
+    navBarProvider.setFollowings(userLogin['userId']);
 
 
     var postmodel = PostModel();
@@ -79,7 +82,7 @@ class CustomDrawer extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8.0, left: 10),
-                      child: postmodel.user.bio.text
+                      child: "User".text
                           .color(Colors.blue)
                           .minFontSize(Get.textScaleFactor)
                           .make(),
@@ -87,45 +90,90 @@ class CustomDrawer extends StatelessWidget {
                     const Divider(
                       thickness: 1,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          // postmodel.user.followings.text
-                          // followers!.length.text
-                          "0".text
-                              .fontWeight(FontWeight.w600)
-                              .minFontSize(Get.textScaleFactor * 18)
-                              .make(),
-                          SizedBox(
-                            width: Get.width * 0.1,
-                          ),
-                          'Followings'
-                              .text
-                              .minFontSize(Get.textScaleFactor)
-                              .make(),
-                        ],
+                    InkWell(
+                      onTap: () async{
+                        final followings = navBarProvider.getFollowings();
+                        final dio = Dio();
+                        final res = await dio.post('https://10.0.2.2:7284/api/Account/GetListFollowings',
+                          data: followings
+                        );
+
+                        List list = res.data as List;
+                        List<Profile> users = list.map((e) => Profile.fromJson(e)).toList();
+
+                        showDialog(context: context, builder: (context) {
+                          return AlertDialog(
+                            title: Text('Followings'),
+                            content: setupAlertDialoadContainer(users),
+                            actions: [
+                              Center(
+                                child: TextButton(onPressed: (){
+                                  Get.back();
+                                }, child: Text('Close')),
+                              )
+                            ],
+                          );
+                        },);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // postmodel.user.followings.text
+                            // followers!.length.text
+                            navBarProvider.getFollowings().length.text
+                                .fontWeight(FontWeight.w600)
+                                .minFontSize(Get.textScaleFactor * 18)
+                                .make(),
+                            SizedBox(
+                              width: Get.width * 0.1,
+                            ),
+                            'Followings'
+                                .text
+                                .minFontSize(Get.textScaleFactor)
+                                .make(),
+                          ],
+                        ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0, bottom: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          // postmodel.user.followers.text
-                          followers.text
-                              .fontWeight(FontWeight.w600)
-                              .minFontSize(Get.textScaleFactor * 18)
-                              .make(),
-                          SizedBox(
-                            width: Get.width * 0.1,
-                          ),
-                          'Followers'
-                              .text
-                              .minFontSize(Get.textScaleFactor)
-                              .make(),
-                        ],
+                    InkWell(
+                      onTap: () async{
+                        Dio dio = Dio();
+                        final res = await dio.post('https://10.0.2.2:7284/api/Account/GetListFollowers?userId=${userLogin['userId']}');
+
+
+                        List list = res.data as List;
+                        print(list);
+
+                        List<Profile> users = list.map((e) => Profile.fromJson(e)).toList();
+
+                        showDialog(context: context, builder: (context) {
+                          return AlertDialog(
+                            title: Text('Followers'),
+                            content: setupAlertDialoadContainer(users),
+                          );
+                        },);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0, bottom: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // postmodel.user.followers.text
+                            followers.text
+                                .fontWeight(FontWeight.w600)
+                                .minFontSize(Get.textScaleFactor * 18)
+                                .make(),
+                            SizedBox(
+                              width: Get.width * 0.1,
+                            ),
+                            'Followers'
+                                .text
+                                .minFontSize(Get.textScaleFactor)
+                                .make(),
+                          ],
+                        ),
                       ),
                     ),
                     const Divider(
@@ -276,6 +324,25 @@ class CustomDrawer extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  setupAlertDialoadContainer(List<Profile>? users) {
+    return Container(
+      height: 300,
+      width: 300,
+      child: ListView.builder(itemBuilder: (context, index) {
+        return ListTile(
+          title: Text('${users?[index].name}'),
+          leading: Image.network('${users?[index].image}'),
+          subtitle: Text('${users?[index].gender}'),
+          onTap: (){
+            Get.toNamed('/profilepage', arguments: users?[index].id );
+          },
+        );
+      },
+      itemCount: users?.length ?? 0,
+      shrinkWrap: true,),
     );
   }
 }

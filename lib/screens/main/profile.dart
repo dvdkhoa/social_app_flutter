@@ -29,8 +29,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String userId = Get.arguments.toString();
 
-
-
   Future _callAPIGetUser() async{
     final dio = Dio();
     final res = await dio.get('https://10.0.2.2:7284/api/Account/GetUser?userId='+userId);
@@ -63,8 +61,14 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     var postmodel = PostModel();
-    print('222');
-    print(userId);
+    
+    if(_user == null)
+      return Center(child: CircularProgressIndicator());
+
+    final map = Map<String, dynamic>.from(_user['followers']);
+    final followers = map.length;
+    final followings = (_user['followings'] as List).length;
+
 
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(0.9),
@@ -134,10 +138,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      postmodel.user.followings.text
+                                      followings != null ? followings.text
                                           .fontWeight(FontWeight.w600)
                                           .minFontSize(Get.textScaleFactor * 18)
-                                          .make(),
+                                          .make() : CircularProgressIndicator()
+                                          ,
                                       SizedBox(
                                         width: Get.width * 0.02,
                                       ),
@@ -150,14 +155,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      postmodel.user.followings.text
+                                      followers != null ? followers.text
                                           .fontWeight(FontWeight.w600)
                                           .minFontSize(Get.textScaleFactor * 18)
-                                          .make(),
+                                          .make() : CircularProgressIndicator(),
                                       SizedBox(
                                         width: Get.width * 0.02,
                                       ),
-                                      'Followings'
+                                      'Followers'
                                           .text
                                           .minFontSize(Get.textScaleFactor)
                                           .make(),

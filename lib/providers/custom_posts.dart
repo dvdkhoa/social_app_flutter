@@ -138,5 +138,12 @@ class PostsProvider extends ChangeNotifier {
   Future<void> sharePost(String postId, String userId) async{
     Dio dio = Dio();
     final res = await Dio().post('https://10.0.2.2:7284/api/Post/Share?userId=${userId}&postId=${postId}');
+
+    final map = Map<String, dynamic>.from(res.data);
+
+    PostModel newPost = PostModel.fromJson(map);
+    _myWall.add(newPost);
+    _news.add(newPost);
+    notifyListeners();
   }
 }

@@ -10,6 +10,9 @@ class NavBarProvider with ChangeNotifier {
   
   int _follower = 0;
 
+  List<String> followings = [];
+
+
   int getFollow(){
     return _follower;
   }
@@ -22,10 +25,21 @@ class NavBarProvider with ChangeNotifier {
     final followers = map['followers'] as Map;
 
     _follower = followers.length;
-    print(_follower);
     notifyListeners();
   }
-  
+
+  void setFollowings(userId) async{
+    Dio dio = Dio();
+    final res = await dio.post('https://10.0.2.2:7284/api/Account/GetFollowings?userId=${userId}');
+
+    followings = (res.data as List).map((e) => e.toString()).toList();
+
+    print(followings);
+    notifyListeners();
+  }
+
+  List<String> getFollowings() => followings;
+
   
   void addAllUser(List users){
     _users = users;
