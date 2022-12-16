@@ -146,4 +146,5 @@ class PostsProvider extends ChangeNotifier {
     _news.add(newPost);
     notifyListeners();
   }
+
 }

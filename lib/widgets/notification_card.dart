@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ltp/models/usermodel.dart';
+// import 'package:ltp/models/usermodel.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../models/notification_model.dart';
 
 class NotificationCard extends StatelessWidget {
   const NotificationCard({Key? key, required this.notificate}) : super(key: key);
@@ -21,7 +22,7 @@ class NotificationCard extends StatelessWidget {
               padding: const EdgeInsets.only(left: 10.0, right: 15),
               child: CircleAvatar(
                 backgroundImage: NetworkImage(
-                  notificate.profileImage,
+                  notificate.thumbnail.toString(),
                 ),
                 radius: 35,
               ),
@@ -32,14 +33,14 @@ class NotificationCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  notificate.title.text
+                  notificate.message.toString().text
                       .minFontSize(20)
                       .fontWeight(FontWeight.w700)
                       .make(),
                   const Divider(
                     height: 5,
                   ),
-                  notificate.time.text.color(Colors.blue).minFontSize(15).make(),
+                  notificate.created!.text.color(Colors.blue).minFontSize(15).make(),
                 ],
               ),
             ),
