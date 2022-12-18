@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:ltp/models/notification_model.dart';
+import 'package:ltp/widgets/inbox_card.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../models/user_login.dart';
@@ -14,37 +16,41 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-
-  late NotiProvider _notiProvider;
-
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_){
-      _notiProvider = Provider.of<NotiProvider>(context, listen: false);
+      final _notiProvider = Provider.of<NotiProvider>(context, listen: false);
       final user = User.fromJson(GetStorage().read('userLogin'));
+      _notiProvider.getNotify(user.userId);
     });
   }
 
 
   @override
   Widget build(BuildContext context) {
-    // final notification = NotificationModel(
-    //   title: 'Abcxyz',
-    //   time: '20/01/2022',
-    //   profileImage:
-    //   'https://png.pngtree.com/png-vector/20201208/ourlarge/pngtree-a-bell-with-shadow-png-image_2532776.jpg',
-    //   bannerImage:
-    //   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSb4eWdIockxFe4lcwv4f-IQ5PeiDHE3lKR7A&usqp=CAU',
-    // );
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        // InboxCard(userinbox: donaldTrump),
-        NotificationCard(notificate: ,)
-        //InboxCard(user:),
-      ],
+
+    return Consumer<NotiProvider>(
+      builder: (context, value, child) {
+        if(value.isLoading){
+          return const Center(child: CircularProgressIndicator(),);
+        }
+        return ListView.builder(
+          itemCount: value.notifications.length,
+          itemBuilder: (context, index) {
+            return NotificationCard(notificate: value.notifications[index],);
+        },);
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        // children: [
+        //   InboxCard(userinbox: donaldTrump),
+        //   NotificationCard(notificate: ,)
+        //   InboxCard(user:),
+        // ],
+        children: [],
+      ),
     );
     // return 'Notifications'.text.makeCentered();
   }

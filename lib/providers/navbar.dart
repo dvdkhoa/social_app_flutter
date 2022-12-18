@@ -30,6 +30,7 @@ class NavBarProvider with ChangeNotifier {
 
   void setFollowings(userId) async{
     Dio dio = Dio();
+    print(userId);
     final res = await dio.post('https://10.0.2.2:7284/api/Account/GetFollowings?userId=${userId}');
 
     followings = (res.data as List).map((e) => e.toString()).toList();

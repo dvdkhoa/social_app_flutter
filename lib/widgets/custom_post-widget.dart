@@ -209,7 +209,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
       return Container();
     }
 
-    if(widget.post!.share!.originPostId != null){
+    if(widget.post?.share?.originPostId != null){
       return Container(
         padding: EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
@@ -264,7 +264,7 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                                 RichText(
                                   text: TextSpan(
                                     text: widget.post.by?.name,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 17,
                                       color: kMainColor,
                                       fontWeight: FontWeight.w700
@@ -277,27 +277,13 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                                     ],
                                   ),
                                 )
-                                // datamodel.user.bio.text
-                                //     .minFontSize(12)
-                                //     .maxFontSize(13)
-                                //     .color(Colors.blue)
-                                //     .make(),
-                                // const SizedBox(
-                                //   height: 5,
-                                // ),
-                                // VxTextBuilder("đã chia sẻ")
-                                //     .minFontSize(17)
-                                //     .maxFontSize(18)
-                                //     .fontWeight(FontWeight.w500)
-                                //     .color(kmaintxtColor)
-                                //     .make()
                               ]),
                         ),
                         buildSettingButton()
                       ],
                     ),
                   ),
-                  SizedBox(width: 30,),
+                  const SizedBox(width: 20,),
                 ],
               ),
             ),
@@ -324,11 +310,11 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                         padding: const EdgeInsets.only(left: 5.0, top: 5),
                         child: InkWell(
                           onTap: () {
-                            if(userLogin['userId'] == widget.post.by!.id){
+                            if(userLogin['userId'] == widget.post.share?.originOwner?.id){
                               Get.toNamed("/myprofilepage");
                             }
                             else {
-                              Get.toNamed("/profilepage", arguments: widget.post.by!.id);
+                              Get.toNamed("/profilepage", arguments: widget.post.share?.originOwner?.id);
                             }
                           },
                           child: CircleAvatar(
@@ -588,50 +574,59 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0, top: 5),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        VxTextBuilder(widget.post.by?.name ?? "")
-                            .minFontSize(17)
-                            .color(kMainColor)
-                            .maxFontSize(18)
-                            .fontWeight(FontWeight.w700)
-                            .make(),
-                        // datamodel.user.bio.text
-                        //     .minFontSize(12)
-                        //     .maxFontSize(13)
-                        //     .color(Colors.blue)
-                        //     .make(),
-                        const SizedBox(
-                          height: 5,
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0, top: 5),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                VxTextBuilder(widget.post.by?.name ?? "")
+                                    .minFontSize(17)
+                                    .color(kMainColor)
+                                    .maxFontSize(18)
+                                    .fontWeight(FontWeight.w700)
+                                    .make(),
+                                // datamodel.user.bio.text
+                                //     .minFontSize(12)
+                                //     .maxFontSize(13)
+                                //     .color(Colors.blue)
+                                //     .make(),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.access_time,
+                                      color: kMainColor,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(
+                                      width: 2,
+                                    ),
+                                    timeCreated_formatted
+                                        .toString()
+                                        .text
+                                        .letterSpacing(1)
+                                        .minFontSize(10)
+                                        .maxFontSize(12)
+                                        .color(Colors.black)
+                                        .make(),
+                                  ],
+                                ),
+                              ]),
                         ),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.access_time,
-                              color: kMainColor,
-                              size: 18,
-                            ),
-                            const SizedBox(
-                              width: 2,
-                            ),
-                            timeCreated_formatted
-                                .toString()
-                                .text
-                                .letterSpacing(1)
-                                .minFontSize(10)
-                                .maxFontSize(12)
-                                .color(Colors.black)
-                                .make(),
-                          ],
-                        ),
-                      ]),
-                ),
-                SizedBox(width: 30,),
-                buildSettingButton()
+                        buildSettingButton(),
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           ),

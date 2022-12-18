@@ -11,6 +11,7 @@ import 'package:ltp/utils/constants.dart';
 import 'package:ltp/utils/routes.dart';
 import 'package:provider/provider.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:ltp/providers/custom_notification.dart';
 
 main() async {
   await GetStorage.init();
@@ -41,6 +42,9 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProvider(
               create: (context) => CommonProvider()
+          ),
+          ChangeNotifierProvider(
+              create: (context) => NotiProvider()
           )
         ],
         child: GetMaterialApp(
