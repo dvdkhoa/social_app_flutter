@@ -48,84 +48,64 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
   }
 
 
-  void _getTapPosition(TapDownDetails details) {
-    print('tap nhe');
-    final RenderBox referenceBox = context.findRenderObject() as RenderBox;
-    setState(() {
-      print(_tapPosition);
-      _tapPosition = referenceBox.globalToLocal(details.globalPosition);
-    });
-  }
-
-  // _showPopupMenu() async {
+  // void _getTapPosition(TapDownDetails details) {
+  //   print('tap nhe');
   //   final RenderBox referenceBox = context.findRenderObject() as RenderBox;
-  //   final RenderObject? overlay =
-  //   Overlay.of(context)?.context.findRenderObject();
-  //   await showMenu(
-  //     context: context,
-  //     position: RelativeRect.fromRect(
-  //         _tapPosition & Size(40, 40), // smaller rect, the touch area
-  //         Offset.zero & overlay?.size // Bigger rect, the entire screen
-  //     ),
-  //     items: [
-  //       PopupMenuItem(
-  //         child: Text("Show Usage"),
-  //       ),
-  //       PopupMenuItem(
-  //         child: Text("Delete"),
-  //       ),
-  //     ],
-  //     elevation: 8.0,
-  //   );
+  //   setState(() {
+  //     print(_tapPosition);
+  //     _tapPosition = referenceBox.globalToLocal(details.globalPosition);
+  //   });
+  // }
+  //
+
+  //
+  // void _storePosition(TapDownDetails details) {
+  //   _tapPosition = details.globalPosition;
   // }
 
-  void _storePosition(TapDownDetails details) {
-    _tapPosition = details.globalPosition;
-  }
-
   // This function will be called when you long press on the blue box or the image
-  void _showContextMenu(BuildContext context) async {
-    final RenderObject? overlay =
-    Overlay.of(context)?.context.findRenderObject();
-
-
-
-    final result = await showMenu(
-        context: context,
-
-        // Show the context menu at the tap location
-        position:
-        // RelativeRect.fromLTRB(200, 150, 100, 100),
-        RelativeRect.fromRect(
-            Rect.fromLTWH(_tapPosition.dx, _tapPosition.dy, 30, 30),
-            Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width,
-                overlay.paintBounds.size.height)),
-
-        // set a list of choices for the context menu
-        items: [
-          const PopupMenuItem(
-            value: 'edit',
-            child: Text('Edit'),
-          ),
-          const PopupMenuItem(
-            value: 'delete',
-            child: Text('Delete'),
-          ),
-
-        ]);
-
-    // Implement the logic for each choice here
-    switch (result) {
-      case 'edit':
-      // debugPrint('Add To Favorites');
-        Get.toNamed('/editpostpage', arguments: widget.post.id);
-        break;
-      case 'delete':
-        _postsProvider.deletePost(widget.post.id.toString());
-        break;
-
-    }
-  }
+  // void _showContextMenu(BuildContext context) async {
+  //   final RenderObject? overlay =
+  //   Overlay.of(context)?.context.findRenderObject();
+  //
+  //
+  //
+  //   final result = await showMenu(
+  //       context: context,
+  //
+  //       // Show the context menu at the tap location
+  //       position:
+  //       // RelativeRect.fromLTRB(200, 150, 100, 100),
+  //       RelativeRect.fromRect(
+  //           Rect.fromLTWH(_tapPosition.dx, _tapPosition.dy, 30, 30),
+  //           Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width,
+  //               overlay.paintBounds.size.height)),
+  //
+  //       // set a list of choices for the context menu
+  //       items: [
+  //         const PopupMenuItem(
+  //           value: 'edit',
+  //           child: Text('Edit'),
+  //         ),
+  //         const PopupMenuItem(
+  //           value: 'delete',
+  //           child: Text('Delete'),
+  //         ),
+  //
+  //       ]);
+  //
+  //   // Implement the logic for each choice here
+  //   switch (result) {
+  //     case 'edit':
+  //     // debugPrint('Add To Favorites');
+  //       Get.toNamed('/editpostpage', arguments: widget.post.id);
+  //       break;
+  //     case 'delete':
+  //       _postsProvider.deletePost(widget.post.id.toString());
+  //       break;
+  //
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -137,6 +117,38 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
         isLike = true;
       }
     });
+
+    void _onButtonPressed() {
+      showModalBottomSheet(context: context, builder: (context){
+        return Container(
+          height: 150,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+              )
+          ),
+          child: Column(children: <Widget>[
+            ListTile(
+              leading: Icon(Icons.remove_red_eye),
+              title: Text('Edit Post'),
+              onTap:(){
+                Get.toNamed('/editpostpage', arguments: widget.post.id);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.file_upload),
+              title: Text('Delete Post'),
+              onTap:(){
+                _postsProvider.deletePost(widget.post.id.toString());
+              },
+            ),
+          ],),
+        );
+      });
+    }
+
+
 
     Future<void> _showShareDialog() async {
       return showDialog<void>(
@@ -194,16 +206,14 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
 
     Widget buildSettingButton() {
       if(userLogin['userId'] == widget.post.by!.id) {
-        return GestureDetector(
-          onTapDown: (details)  {
-            _getTapPosition(details);
-            _showContextMenu(context);
-          },
-          // onLongPress: () async{
-          //   _showContextMenu(context);
-          // },
+        return Column(
+          children: [
 
-          child: Icon(Icons.settings),
+            InkWell(
+              child: Icon(Icons.settings),
+              onTap: () => _onButtonPressed(),
+            )
+          ],
         );
       }
       return Container();
