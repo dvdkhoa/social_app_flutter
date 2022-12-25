@@ -152,6 +152,13 @@ class CustomDrawer extends StatelessWidget {
                           return AlertDialog(
                             title: Text('Followers'),
                             content: setupAlertDialoadContainer(users),
+                            actions: [
+                              Center(
+                                child: TextButton(onPressed: (){
+                                  Get.back();
+                                }, child: Text('Close')),
+                              )
+                            ],
                           );
                         },);
                       },

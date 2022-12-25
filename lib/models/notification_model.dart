@@ -1,8 +1,11 @@
+
+
 class NotificationModel {
   String? id;
   String? message;
   String? thumbnail;
-  String? intent;
+  String? type;
+  String? intentId;
   String? created;
   bool? seen;
 
@@ -10,7 +13,8 @@ class NotificationModel {
       {this.id,
         this.message,
         this.thumbnail,
-        this.intent,
+        this.type,
+        this.intentId,
         this.created,
         this.seen});
 
@@ -18,7 +22,8 @@ class NotificationModel {
     id = json['id'];
     message = json['message'];
     thumbnail = json['thumbnail'];
-    intent = json['intent'];
+    intentId = json['intentId'];
+    type = json['type'];
     created = json['created'];
     seen = json['seen'];
   }
@@ -27,8 +32,9 @@ class NotificationModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['message'] = this.message;
+    data['type'] = this.type;
     data['thumbnail'] = this.thumbnail;
-    data['intent'] = this.intent;
+    data['intentId'] = this.intentId;
     data['created'] = this.created;
     data['seen'] = this.seen;
     return data;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/notification_model.dart';
 import 'package:ltp/widgets/inbox_card.dart';
@@ -39,7 +40,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         return ListView.builder(
           itemCount: value.notifications.length,
           itemBuilder: (context, index) {
-            return NotificationCard(notificate: value.notifications[index],);
+            return NotificationCard(notificate: value.notifications[index]);
         },);
       },
       child: Column(

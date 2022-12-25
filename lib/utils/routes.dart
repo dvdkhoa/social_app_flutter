@@ -16,6 +16,7 @@ import '../screens/main/change_avata.dart';
 import '../screens/main/inbox.dart';
 import '../screens/main/myprofile.dart';
 import '../screens/main/notifications.dart';
+import '../screens/main/post_detail.dart';
 import '../screens/main/post_edit.dart';
 import '../screens/main/post.dart';
 import '../screens/main/profile.dart';
@@ -82,6 +83,10 @@ class RoutingPages {
     GetPage(
       name: '/commentspage',
       page: () => CustomCommentsPage(),
+    ),
+    GetPage(
+      name: '/postdetailpage',
+      page: () => PostDetail(),
     ),
     GetPage(
       name: '/msgspage',

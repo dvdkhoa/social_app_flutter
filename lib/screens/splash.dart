@@ -37,7 +37,7 @@ class _SplashPageState extends State<SplashPage> {
         style: TextStyle(color: kMainColor),
       ),
       navigator: GetStorage().read('userLogin') != null ? WrapperManager() : SignInPage(),
-      durationInSeconds: 5,
+      durationInSeconds: 2,
     );
   }
 }

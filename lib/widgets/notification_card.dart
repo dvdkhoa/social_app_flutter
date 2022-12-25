@@ -20,7 +20,13 @@ class NotificationCard extends StatelessWidget {
     String timeCreated_formatted = formatter.format(timeCreated);
 
     return InkWell(
-      // onTap: (() => Get.toNamed('/msgspage', argumentnts: userinbox)),
+      onTap: (() {
+        if(notificate.type == 'Comment'){
+          Get.toNamed('/commentspage', arguments: notificate.intentId);
+        } else if(notificate.type == "Like") {
+          Get.toNamed('/postdetailpage', arguments: notificate.intentId);
+        }
+      }),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 5),
         height: Get.height * 0.13,
