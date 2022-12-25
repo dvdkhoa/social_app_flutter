@@ -61,4 +61,14 @@ class PostService {
     }
     throw Exception('Create post failed!!!');
   }
+
+  Future<PostModel> getPost (String postId) async {
+    final res = await dio.get('https://10.0.2.2:7284/api/Post/GetPost?postId=${postId}');
+
+    // final map = Map<String, dynamic>.from(res.data);
+    print(res.data);
+    // print('abc');
+    PostModel postModel = PostModel.fromJson(res.data);
+    return postModel;
+  }
 }
