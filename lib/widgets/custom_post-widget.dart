@@ -130,14 +130,14 @@ class _CustomPostWidgetState extends State<CustomPostWidget> {
           ),
           child: Column(children: <Widget>[
             ListTile(
-              leading: Icon(Icons.remove_red_eye),
+              leading: Icon(Icons.edit),
               title: Text('Edit Post'),
               onTap:(){
                 Get.toNamed('/editpostpage', arguments: widget.post.id);
               },
             ),
             ListTile(
-              leading: Icon(Icons.file_upload),
+              leading: Icon(Icons.delete),
               title: Text('Delete Post'),
               onTap:(){
                 _postsProvider.deletePost(widget.post.id.toString());
