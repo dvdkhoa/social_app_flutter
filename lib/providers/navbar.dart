@@ -9,8 +9,10 @@ class NavBarProvider with ChangeNotifier {
   List _users = [];
   
   int _follower = 0;
-  
-  
+
+  List<String> followings = [];
+
+
   int getFollow(){
     return _follower;
   }
@@ -18,18 +20,27 @@ class NavBarProvider with ChangeNotifier {
   void setFollow(userId) async{
     final res = await Dio().get('https://10.0.2.2:7284/api/Account/GetUser?userId='+userId);
 
-    print('123abc');
-    // print(res);
-
     final map = Map<String, dynamic>.from(res.data);
 
     final followers = map['followers'] as Map;
 
     _follower = followers.length;
-    print(_follower);
     notifyListeners();
   }
-  
+
+  void setFollowings(userId) async{
+    Dio dio = Dio();
+    print(userId);
+    final res = await dio.post('https://10.0.2.2:7284/api/Account/GetFollowings?userId=${userId}');
+
+    followings = (res.data as List).map((e) => e.toString()).toList();
+
+    print(followings);
+    notifyListeners();
+  }
+
+  List<String> getFollowings() => followings;
+
   
   void addAllUser(List users){
     _users = users;
@@ -85,6 +96,8 @@ class NavBarProvider with ChangeNotifier {
           height: Get.height * 0.05,
           child:  Center(
             child: TextField(
+
+              textAlignVertical: TextAlignVertical.bottom,
               onChanged: (value) {
                 if(!value.isEmptyOrNull)
                 {
@@ -99,13 +112,17 @@ class NavBarProvider with ChangeNotifier {
                 }
               },
               style: TextStyle(
+
                 color: Colors.white,
               ),
               cursorColor: Colors.white,
               decoration: InputDecoration(
+
                   hintText: 'Search for Anything',
                   hintStyle: TextStyle(
+
                     color: Color.fromARGB(255, 231, 228, 228),
+
                   ),
                   border: InputBorder.none),
             ),

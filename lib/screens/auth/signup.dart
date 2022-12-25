@@ -128,7 +128,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 Row(
                   children: [
-                    Text('Chọn ngày sinh:'),
+                    Text('Date of birth:'),
                     Padding(padding: EdgeInsets.only(right: 20)),
                     Expanded(
                       child: ElevatedButton(
@@ -147,7 +147,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 }, currentTime: DateTime.now(), locale: LocaleType.vi);
                           },
                           child: Text(
-                            _birthday == null ?'Click để chọn' : formatter.format(_birthday!),
+                            _birthday == null ?'Choose' : formatter.format(_birthday!),
                             // style: TextStyle(color: Colors.blue),
                           )),
                     ),
@@ -156,7 +156,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Chọn giới tính:'),
+                    const Text('Gender:'),
                     ListTile(
                       leading: Radio<String>(
                         value: 'male',

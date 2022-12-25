@@ -4,6 +4,7 @@ class PostModel {
   int? type;
   Meta? meta;
   Detail? detail;
+  Share? share;
   List<Comments>? comments;
   List<Likes>? likes;
 
@@ -23,6 +24,7 @@ class PostModel {
     meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
     detail =
     json['detail'] != null ? new Detail.fromJson(json['detail']) : null;
+    share = json['share'] != null ? new Share.fromJson(json['share']) : null;
     if (json['comments'] != null) {
       comments = <Comments>[];
       json['comments'].forEach((v) {
@@ -199,3 +201,55 @@ class Likes {
     return data;
   }
 }
+
+class Share {
+  String? originPostId;
+  OriginOwner? originOwner;
+
+  Share({this.originPostId, this.originOwner});
+
+  Share.fromJson(Map<String, dynamic> json) {
+    originPostId = json['originPostId'];
+    originOwner = json['originOwner'] != null
+        ? new OriginOwner.fromJson(json['originOwner'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['originPostId'] = this.originPostId;
+    if (this.originOwner != null) {
+      data['originOwner'] = this.originOwner!.toJson();
+    }
+    return data;
+  }
+}
+
+class OriginOwner {
+  String? id;
+  String? name;
+  String? image;
+  String? background;
+  String? gender;
+
+  OriginOwner({this.id, this.name, this.image, this.background, this.gender});
+
+  OriginOwner.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    image = json['image'];
+    background = json['background'];
+    gender = json['gender'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['name'] = this.name;
+    data['image'] = this.image;
+    data['background'] = this.background;
+    data['gender'] = this.gender;
+    return data;
+  }
+}
+

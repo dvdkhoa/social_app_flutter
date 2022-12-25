@@ -6,9 +6,13 @@ import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:ltp/models/postmodel.dart';
 import 'package:ltp/utils/constants.dart';
+import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../../models/user_login.dart';
+import '../../providers/common_provider.dart';
 
 // ignore: must_be_immutable
 class ChangeAvata extends StatefulWidget {
@@ -19,6 +23,12 @@ class ChangeAvata extends StatefulWidget {
 }
 
 class _PostScreenState extends State<ChangeAvata> {
+  int change = Get.arguments;
+
+
+  late CommonProvider common_provider;
+
+
   ImagePicker picker = ImagePicker();
 
   final userLogin = GetStorage().read("userLogin");
@@ -40,134 +50,123 @@ class _PostScreenState extends State<ChangeAvata> {
     });
   }
 
-  // void uploadIt() async {
-  //   var myPostModel = PostModel();
-  //   String texty = formController.text;
-  //
-  //   if (texty.isEmpty && imageFile == null) {
-  //     return;
-  //   } else {
-  //     if (texty.isNotEmpty) {
-  //       myPostModel.tweetText = texty;
-  //     } else {}
-  //     if (imageFile != null) {
-  //       myPostModel.tweetImage = imageFile;
-  //     } else {}
-  //     myPostModel.uploadTime = DateFormat.yMEd().format(DateTime.now());
-  //     Get.back(result: myPostModel);
-  //   }
-  // }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      common_provider = Provider.of<CommonProvider>(context, listen: false);
+    });
+  }
 
   void uploadPost() async{
     // print(userLogin['userId']);
-    dio.FormData formData ;
+    dio.FormData? formData ;
     if (imageFile != null) {
-      // print('imagefile khong null');
       String? fileName = imageFile?.path.split('/').last;
 
       final file = await dio.MultipartFile.fromFile(imageFile!.path, filename: fileName);
 
-      // print(file);
-      // print('filepath: ${imageFile!.path}');
-
       formData = dio.FormData.fromMap({
-        "UserId": userLogin['userId'],
-        "Text": formController.text,
-        "PhotoFile": file,
-      });
-    }else {
-      // print('imagefile null');
-
-      formData = dio.FormData.fromMap({
-        "UserId": userLogin['userId'],
-        "Text": formController.text,
+        "file": file,
       });
     }
-    // print('file upload');
-    // print(imageFile);
+    if(formData != null){
+      context.loaderOverlay.show();
+      final res = await dio.Dio().put("https://10.0.2.2:7284/api/Account/${ change == 0 ? "ChangeAvatar" : "ChangeBackground"  }?userId="+userLogin['userId'],
+        data: formData,
+      );
+      print(res.data);
+      print(res.data['data']);
 
-    final res = await dio.Dio().post("https://10.0.2.2:7284/api/Post/CreatePost",
-      data: formData,
-      //   onSendProgress: (send, total) {
-      // // print("send: $send, total: $total");
-      //   }
-    );
+      User user = User.fromJson(userLogin);
 
-    print(res);
+      if(change == 0){
+        user.profile!.image = res.data['data'];
+      }else{
+        user.profile!.background = res.data['data'];
+      }
+
+      common_provider.setUser(user);
+    }
+    context.loaderOverlay.hide();
 
     Get.back();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        centerTitle: true,
-        title: 'Change Screen'.text.make(),
-      ),
-      body: SizedBox(
-        child: Form(
-          child: Column(
-            children: [
-              Padding(
-                padding:
-                const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                child: Container(
+    return LoaderOverlay(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          centerTitle: true,
+          title: change == 0 ? 'Change Avatar'.text.make()
+                              : 'Change Background'.text.make(),
+        ),
+        body: SizedBox(
+          child: Form(
+            child: Column(
+              children: [
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                  child: Container(
 
+                  ),
                 ),
-              ),
-              InkWell(
-                onTap: () {
-                  chooseImage();
-                },
-                child: imageFile == null
-                    ? Container(
-                  margin: const EdgeInsets.only(top: 200),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Icon(
-                          Icons.upload_outlined,
-                          size: 50,
-                          color: kMainColor,
-                        ),
-                        'Select Image'.text.make(),
-                      ]),
-                )
-                    : Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Image.file(
-                      imageFile!,
-                      width: Get.width * 0.5,
+                InkWell(
+                  onTap: () {
+                    chooseImage();
+                  },
+                  child: imageFile == null
+                      ? Container(
+                    margin: const EdgeInsets.only(top: 200),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Icon(
+                            Icons.upload_outlined,
+                            size: 50,
+                            color: kMainColor,
+                          ),
+                          'Select Image'.text.make(),
+                        ]),
+                  )
+                      : Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Image.file(
+                        imageFile!,
+                        width: Get.width * 0.5,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const Spacer(),
-              Container(
-                width: Get.width * 0.7,
-                height: Get.height * 0.1,
-                padding: const EdgeInsets.only(
-                  bottom: 30,
+                const Spacer(),
+                Container(
+                  width: Get.width * 0.7,
+                  height: Get.height * 0.1,
+                  padding: const EdgeInsets.only(
+                    bottom: 30,
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () async{
+                      // uploadIt();
+                      uploadPost();
+                    },
+                    child: 'Upload'
+                        .text
+                        .minFontSize(20)
+                        .fontWeight(FontWeight.w500)
+                        .make(),
+                  ),
                 ),
-                child: ElevatedButton(
-                  onPressed: () async{
-                    // uploadIt();
-                    uploadPost();
-                  },
-                  child: 'Upload'
-                      .text
-                      .minFontSize(20)
-                      .fontWeight(FontWeight.w500)
-                      .make(),
+                SizedBox(
+                  height: Get.height * 0.025,
                 ),
-              ),
-              SizedBox(
-                height: Get.height * 0.025,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

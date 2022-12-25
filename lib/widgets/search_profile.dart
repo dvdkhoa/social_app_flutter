@@ -68,28 +68,29 @@ class _SearchProfileState extends State<SearchProfile> {
                       .fontWeight(FontWeight.w500)
                       .color(ktxtwhiteColor)
                       .make(),
-                  'Humorous'
+                  // 'Humorous'
+                  'User'
                       .text
                       .minFontSize(10)
                       .fontWeight(FontWeight.w400)
                       .color(ktxtwhiteColor)
                       .make(),
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 3),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: ktxtwhiteColor)),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 3.0, horizontal: 5),
-                      child: 'Follow'
-                          .text
-                          .fontWeight(FontWeight.w500)
-                          .letterSpacing(1)
-                          .color(ktxtwhiteColor)
-                          .make(),
-                    ),
-                  ),
+                  // Container(
+                  //   margin: const EdgeInsets.symmetric(vertical: 3),
+                  //   decoration: BoxDecoration(
+                  //       borderRadius: BorderRadius.circular(5),
+                  //       border: Border.all(color: ktxtwhiteColor)),
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.symmetric(
+                  //         vertical: 3.0, horizontal: 5),
+                  //     child: 'Follow'
+                  //         .text
+                  //         .fontWeight(FontWeight.w500)
+                  //         .letterSpacing(1)
+                  //         .color(ktxtwhiteColor)
+                  //         .make(),
+                  //   ),
+                  // ),
                 ],
               ),
             )

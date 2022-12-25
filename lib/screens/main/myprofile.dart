@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ltp/models/postmodel.dart';
+import 'package:ltp/providers/common_provider.dart';
 import 'package:ltp/providers/custom_posts.dart';
 import 'package:ltp/utils/constants.dart';
 import 'package:ltp/widgets/custom_post-widget.dart';
 import 'package:ltp/widgets/post_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../../models/user_login.dart';
 
 class myProfilePage extends StatefulWidget {
   myProfilePage({Key? key}) : super(key: key);
@@ -37,6 +39,7 @@ class _ProfilePageState extends State<myProfilePage> {
 
     final map = Map<String, dynamic>.from(res.data);
 
+    // if()
     var list = map['data'] as List;
 
     return list;
@@ -50,7 +53,8 @@ class _ProfilePageState extends State<myProfilePage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final postProvider = Provider.of<PostsProvider>(context, listen: false);
-      postProvider.getMyWallFromServer();
+      final user = User.fromJson(GetStorage().read("userLogin"));
+      postProvider.getMyWallFromServer(user.userId.toString());
     });
 
     _callAPI = _callAPIPost();
@@ -65,44 +69,51 @@ class _ProfilePageState extends State<myProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+
+    final commonProvider = Provider.of<CommonProvider>(context, listen: true);
+    User user = commonProvider.getUser;
+
+
+    print(user.followers!.length.toString());
+
+
     var postmodel = PostModel();
+    print(user.profile!.background.toString());
 
-    void _onButtonPressed(bool isChoose) {
+    void _onButtonPressed(bool isChoose, int change) {
       showModalBottomSheet(context: context, builder: (context){
-
         return Container(
           height: 150,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(30),
-                topRight: const Radius.circular(30),
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
               )
           ),
           child: Column(children: <Widget>[
             ListTile(
-              leading: Icon(Icons.heart_broken),
-              title: Text('Xem avata'),
+              leading: Icon(Icons.remove_red_eye),
+              title: change == 0 ? Text('View Avatar') : Text('View Background'),
               onTap:(){
                 if(isChoose){
                   showDialog(context: context, builder: (context) => AlertDialog(
                     content: Stack(
                       alignment: Alignment.center,
                       children: [
-
-                        Image.network(userLogin['profile']['image'],
+                        Image.network(user.profile!.image.toString(),
                             fit: BoxFit.cover,
                             height: 200)
-
-
                       ],
                     ),
                   ));
-                }else{
+                } else{
                   showDialog(context: context, builder: (context) => AlertDialog(
                     content: Stack(
                       alignment: Alignment.center,
                       children: [
-                        Image.network(postmodel.user.bannerImage,
+                        Image.network(user.profile!.background != null
+                        ? user.profile!.background.toString()
+                            : postmodel.user.bannerImage,
                             fit: BoxFit.cover,
                             height: 200)
                       ],
@@ -115,9 +126,10 @@ class _ProfilePageState extends State<myProfilePage> {
             ),
             ListTile(
               leading: Icon(Icons.file_upload),
-              title: Text('Đổi avata'),
+              title: change == 0 ? Text('Change Avatar') : Text('Change Background'),
               onTap:(){
-                Get.toNamed('/changeavata');
+                print('change '+change.toString());
+                Get.toNamed('/changeavata',arguments: change);
               },
             ),
           ],),
@@ -148,13 +160,15 @@ class _ProfilePageState extends State<myProfilePage> {
                 //     //   onTap: () => _onButtonPressed(),
                 //     // ),
                     InkWell(
-                      onTap: () => _onButtonPressed(false),
+                      onTap: () => _onButtonPressed(false, 1),
                       child: Container(
                         decoration: BoxDecoration(
                           color: Colors.white12,
                           image: DecorationImage(
                             image: NetworkImage(
-                              postmodel.user.bannerImage,
+                              user.profile!.background == null ?
+                              postmodel.user.bannerImage :
+                              user.profile!.background.toString(),
                             ),
                             fit: BoxFit.cover,
                           ),
@@ -172,14 +186,14 @@ class _ProfilePageState extends State<myProfilePage> {
                   child: Column(
                     children: [
                       InkWell(
-                        onTap: () => _onButtonPressed(true),
+                        onTap: () => _onButtonPressed(true, 0),
                         child: CircleAvatar(
                           backgroundColor: ktxtwhiteColor,
                           radius: Get.height * 0.105,
 
                           child: CircleAvatar(
                             backgroundImage:
-                            NetworkImage(userLogin['profile']['image']),
+                            NetworkImage(user.profile!.image.toString()),
                             radius: Get.height * 0.1,
                           ),
                         ),
@@ -195,7 +209,7 @@ class _ProfilePageState extends State<myProfilePage> {
                               .minFontSize(Get.textScaleFactor * 22)
                               .letterSpacing(2)
                               .makeCentered(),
-                          postmodel.user.bio.text
+                          'User'.text
                               .fontWeight(FontWeight.w500)
                               .minFontSize(Get.textScaleFactor * 16)
                               .color(Colors.blue)
@@ -226,14 +240,15 @@ class _ProfilePageState extends State<myProfilePage> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      postmodel.user.followings.text
+                                      // postmodel.user.followers.text
+                                      user.followers!.length.text
                                           .fontWeight(FontWeight.w600)
                                           .minFontSize(Get.textScaleFactor * 18)
                                           .make(),
                                       SizedBox(
                                         width: Get.width * 0.02,
                                       ),
-                                      'Followings'
+                                      'Follower'
                                           .text
                                           .minFontSize(Get.textScaleFactor)
                                           .make(),
@@ -241,21 +256,21 @@ class _ProfilePageState extends State<myProfilePage> {
                                   ),
                                 ]),
                           ),
-                          InkWell(
-                            onTap: () {},
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                height: Get.height * 0.04,
-                                width: Get.width * 0.2,
-                                color: kaccentColor,
-                                child: 'Follow'
-                                    .text
-                                    .color(Colors.white)
-                                    .makeCentered(),
-                              ),
-                            ),
-                          ),
+                          // InkWell(
+                          //   onTap: () {},
+                          //   child: ClipRRect(
+                          //     borderRadius: BorderRadius.circular(8),
+                          //     child: Container(
+                          //       height: Get.height * 0.04,
+                          //       width: Get.width * 0.2,
+                          //       color: kaccentColor,
+                          //       child: 'Follow'
+                          //           .text
+                          //           .color(Colors.white)
+                          //           .makeCentered(),
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ],
